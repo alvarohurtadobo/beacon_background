@@ -119,9 +119,9 @@ open class BeaconScanPermissionsActivity: PermissionsActivity()  {
         layout.setBackgroundColor(Color.WHITE)
         layout.orientation = LinearLayout.VERTICAL
         val backgroundAccessRequested = intent.getBooleanExtra("backgroundAccessRequested", true)
-        val title = intent.getStringExtra("title") ?: "Permissions Needed"
-        val message = intent.getStringExtra("message") ?: "In order to scan for beacons, this app requrires the following permissions from the operating system.  Please tap each button to grant each required permission."
-        val continueButtonTitle = intent.getStringExtra("continueButtonTitle") ?: "Continue"
+        val title = intent.getStringExtra("title") ?: "Requerimiento de permisos"
+        val message = intent.getStringExtra("message") ?: "Para poder escanear beacons esta aplicación necesita los siguientes permisos desde el sistema operativo. Por favor otórguelos y asegúrese que el bluetooth está encendido para continuar:"
+        val continueButtonTitle = intent.getStringExtra("continueButtonTitle") ?: "Continuar"
         val permissionButtonTitles = intent.getBundleExtra("permissionBundleTitles") ?: getDefaultPermissionTitlesBundle()
 
         permissionGroups = PermissionsHelper(this).beaconScanPermissionGroupsNeeded(backgroundAccessRequested)
@@ -184,8 +184,8 @@ open class BeaconScanPermissionsActivity: PermissionsActivity()  {
     @SuppressLint("InlinedApi")
     fun getDefaultPermissionTitlesBundle(): Bundle {
         val bundle = Bundle()
-        bundle.putString(Manifest.permission.ACCESS_FINE_LOCATION, "Location")
-        bundle.putString(Manifest.permission.ACCESS_BACKGROUND_LOCATION, "Background Location")
+        bundle.putString(Manifest.permission.ACCESS_FINE_LOCATION, "Ubicación")
+        bundle.putString(Manifest.permission.ACCESS_BACKGROUND_LOCATION, "Ubicación en segundo plano")
         bundle.putString(Manifest.permission.BLUETOOTH_SCAN, "Bluetooth")
         return bundle
     }
