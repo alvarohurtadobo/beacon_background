@@ -8,6 +8,12 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
 import org.altbeacon.beacon.*
 import org.altbeacon.bluetooth.BluetoothMedic
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
+var lastDetection = LocalDateTime.now();
 
 class BeaconReferenceApplication: Application() {
     lateinit var region: Region
@@ -61,10 +67,10 @@ class BeaconReferenceApplication: Application() {
         // If you want to continuously range beacons in the background more often than every 15 mintues,
         // you can use the library's built-in foreground service to unlock this behavior on Android
         // 8+.   the method below shows how you set that up.
-        //setupForegroundService()
-        //beaconManager.setEnableScheduledScanJobs(false);
-        //beaconManager.setBackgroundBetweenScanPeriod(0);
-        //beaconManager.setBackgroundScanPeriod(1100);
+        setupForegroundService()
+        beaconManager.setEnableScheduledScanJobs(false);
+        beaconManager.setBackgroundBetweenScanPeriod(5000);
+        beaconManager.setBackgroundScanPeriod(5000);
 
         // Ranging callbacks will drop out if no beacons are detected
         // Monitoring callbacks will be delayed by up to 25 minutes on region exit
@@ -95,8 +101,8 @@ class BeaconReferenceApplication: Application() {
         )
         builder.setContentIntent(pendingIntent);
         val channel =  NotificationChannel("beacon-ref-notification-id",
-            "My Notification Name", NotificationManager.IMPORTANCE_DEFAULT)
-        channel.setDescription("My Notification Channel Description")
+            "Detección de beacon", NotificationManager.IMPORTANCE_DEFAULT)
+        channel.setDescription("Esta notificación se lanza cuando un beacon es detectado")
         val notificationManager =  getSystemService(
                 Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel);
@@ -110,7 +116,7 @@ class BeaconReferenceApplication: Application() {
         }
         else {
             Log.d(TAG, "inside beacon region: "+region)
-            sendNotification()
+//            sendNotification()
         }
     }
 
@@ -118,13 +124,21 @@ class BeaconReferenceApplication: Application() {
         Log.d(MainActivity.TAG, "Ranged: ${beacons.count()} beacons")
         for (beacon: Beacon in beacons) {
             Log.d(TAG, "$beacon about ${beacon.distance} meters away")
+            var currentTime = LocalDateTime.now();
+            if((currentTime.toEpochSecond(ZoneOffset.UTC)-lastDetection.toEpochSecond(ZoneOffset.UTC))>6) {
+                sendNotification((beacon.distance * 100).toInt())
+                lastDetection = currentTime
+            }
         }
+
     }
 
-    private fun sendNotification() {
+    private fun sendNotification(distance: Int) {
+        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+        val current = LocalDateTime.now().format(formatter)
         val builder = NotificationCompat.Builder(this, "beacon-ref-notification-id")
-            .setContentTitle("Beacon Reference Application")
-            .setContentText("A beacon is nearby.")
+            .setContentTitle("Beacon detectado")
+            .setContentText("Distancia de $distance [cm] (Horas: $current)")
             .setSmallIcon(R.drawable.ic_launcher_background)
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addNextIntent(Intent(this, MainActivity::class.java))

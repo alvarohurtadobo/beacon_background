@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         monitoringButton = findViewById<Button>(R.id.monitoringButton)
         beaconListView = findViewById<ListView>(R.id.beaconList)
         beaconCountTextView = findViewById<TextView>(R.id.beaconCount)
-        beaconCountTextView.text = "No beacons detected"
+        beaconCountTextView.text = "No beacons detectados"
         beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf("--"))
     }
 
@@ -69,14 +69,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     val monitoringObserver = Observer<Int> { state ->
-        var dialogTitle = "Beacons detected"
-        var dialogMessage = "didEnterRegionEvent has fired"
+        var dialogTitle = "Beacons detectados"
+        var dialogMessage = "Un beacon a entrado en la región"
         var stateString = "inside"
         if (state == MonitorNotifier.OUTSIDE) {
-            dialogTitle = "No beacons detected"
+            dialogTitle = "No beacons detectados"
             dialogMessage = "didExitRegionEvent has fired"
             stateString == "outside"
-            beaconCountTextView.text = "Outside of the beacon region -- no beacons detected"
+            beaconCountTextView.text = "Fuera de la zona de detección, no beacons detectados"
             beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf("--"))
         }
         else {
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
     val rangingObserver = Observer<Collection<Beacon>> { beacons ->
         Log.d(TAG, "Ranged: ${beacons.count()} beacons")
         if (BeaconManager.getInstanceForApplication(this).rangedRegions.size > 0) {
-            beaconCountTextView.text = "Ranging enabled: ${beacons.count()} beacon(s) detected"
+            beaconCountTextView.text = "Beacons detectados: ${beacons.count()}"
             beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1,
                 beacons
                     .sortedBy { it.distance }
@@ -108,13 +108,13 @@ class MainActivity : AppCompatActivity() {
         val beaconManager = BeaconManager.getInstanceForApplication(this)
         if (beaconManager.rangedRegions.size == 0) {
             beaconManager.startRangingBeacons(beaconReferenceApplication.region)
-            rangingButton.text = "Stop Ranging"
-            beaconCountTextView.text = "Ranging enabled -- awaiting first callback"
+            rangingButton.text = "Detener"
+            beaconCountTextView.text = "Detección habilitada, esperando primera detección"
         }
         else {
             beaconManager.stopRangingBeacons(beaconReferenceApplication.region)
-            rangingButton.text = "Start Ranging"
-            beaconCountTextView.text = "Ranging disabled -- no beacons detected"
+            rangingButton.text = "Reanudar escaneo"
+            beaconCountTextView.text = "Detección deshabilitada, no beacons detectados"
             beaconListView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf("--"))
         }
     }
@@ -125,16 +125,16 @@ class MainActivity : AppCompatActivity() {
         val beaconManager = BeaconManager.getInstanceForApplication(this)
         if (beaconManager.monitoredRegions.size == 0) {
             beaconManager.startMonitoring(beaconReferenceApplication.region)
-            dialogTitle = "Beacon monitoring started."
-            dialogMessage = "You will see a dialog if a beacon is detected, and another if beacons then stop being detected."
-            monitoringButton.text = "Stop Monitoring"
+            dialogTitle = "Monitoreo de beacons iniciado."
+            dialogMessage = "Verás una ventana cuando un beacon es o deja de ser detectado"
+            monitoringButton.text = "Desactivar ventanas"
 
         }
         else {
             beaconManager.stopMonitoring(beaconReferenceApplication.region)
             dialogTitle = "Beacon monitoring stopped."
-            dialogMessage = "You will no longer see dialogs when becaons start/stop being detected."
-            monitoringButton.text = "Start Monitoring"
+            dialogMessage = "Las ventanas de dialogo están deshabilitadas"
+            monitoringButton.text = "Activar ventanas"
         }
         val builder =
             AlertDialog.Builder(this)
