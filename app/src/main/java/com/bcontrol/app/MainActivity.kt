@@ -1,4 +1,4 @@
-package org.altbeacon.beaconreference
+package com.bcontrol.app
 
 import android.app.AlertDialog
 import android.os.Bundle

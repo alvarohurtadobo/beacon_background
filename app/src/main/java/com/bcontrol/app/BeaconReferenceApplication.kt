@@ -1,4 +1,4 @@
-package org.altbeacon.beaconreference
+package com.bcontrol.app
 
 import android.app.*
 import android.content.Context
@@ -7,8 +7,6 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
 import org.altbeacon.beacon.*
-import org.altbeacon.bluetooth.BluetoothMedic
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -125,7 +123,7 @@ class BeaconReferenceApplication: Application() {
         for (beacon: Beacon in beacons) {
             Log.d(TAG, "$beacon about ${beacon.distance} meters away")
             var currentTime = LocalDateTime.now();
-            if((currentTime.toEpochSecond(ZoneOffset.UTC)-lastDetection.toEpochSecond(ZoneOffset.UTC))>6) {
+            if((currentTime.toEpochSecond(ZoneOffset.UTC)- lastDetection.toEpochSecond(ZoneOffset.UTC))>6) {
                 sendNotification((beacon.distance * 100).toInt())
                 lastDetection = currentTime
             }
