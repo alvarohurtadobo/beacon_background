@@ -100,7 +100,7 @@ class BeaconReferenceApplication: Application() {
     fun setupForegroundService() {
         val builder = Notification.Builder(this, "BeaconReferenceApp")
         builder.setSmallIcon(R.drawable.ic_launcher_background)
-        builder.setContentTitle("Buscando Beacons")
+        builder.setContentTitle("Buscando Beacons.")
         val intent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
                 this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
@@ -108,7 +108,7 @@ class BeaconReferenceApplication: Application() {
         builder.setContentIntent(pendingIntent);
         val channel =  NotificationChannel("beacon-ref-notification-id",
             "Detección de beacon", NotificationManager.IMPORTANCE_DEFAULT)
-        channel.setDescription("Esta notificación se lanza cuando un beacon es detectado")
+        channel.setDescription("Esta notificación se lanza cuando un beacon es detectado.")
         val notificationManager =  getSystemService(
                 Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel);
@@ -233,7 +233,7 @@ class MainActivity : AppCompatActivity() {
                 ArrayAdapter(this, android.R.layout.simple_list_item_1, arrayOf("--"))
         }
         else {
-            beaconCountTextView.text = "Inside the beacon region."
+            beaconCountTextView.text = "Dentro de la zona de detección"
         }
         Log.d(TAG, "monitoring state changed to : $stateString")
         val builder =
@@ -263,7 +263,7 @@ class MainActivity : AppCompatActivity() {
         val beaconManager = BeaconManager.getInstanceForApplication(this)
         if (beaconManager.rangedRegions.size == 0) {
             beaconManager.startRangingBeacons(beaconReferenceApplication.region)
-            rangingButton.text = "Detener"
+            rangingButton.text = "Detener escaneo"
             beaconCountTextView.text = "Detección habilitada, esperando primera detección"
         }
         else {
