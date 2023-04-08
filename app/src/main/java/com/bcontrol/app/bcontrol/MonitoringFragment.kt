@@ -37,10 +37,8 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         super.onViewCreated(view, savedInstanceState)
 
         // setContentView(R.layout.fragment_monitoring)  // Originally main here
-        var application = requireActivity().application as BeaconReferenceApplication
-
-        beaconReferenceApplication = application as BeaconReferenceApplication
-
+        beaconReferenceApplication = requireActivity().application as BeaconReferenceApplication
+        beaconReferenceApplication.initBeaconService()
 
         // Set up a Live Data observer for beacon data
         val regionViewModel = BeaconManager.getInstanceForApplication(myContext).getRegionViewModel(beaconReferenceApplication.region)

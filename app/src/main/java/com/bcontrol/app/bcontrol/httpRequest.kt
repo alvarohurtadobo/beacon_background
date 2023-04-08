@@ -7,7 +7,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
-fun postJson(url: String, json: String):String {
+fun postJson(url: String, json: String): MyHttpResponse {
     Log.d("DEBUG","Login with params $json")
     val urlObject = URL(url)
     val connection = urlObject.openConnection() as HttpURLConnection
@@ -29,5 +29,8 @@ fun postJson(url: String, json: String):String {
     val responseBody = inputStream.use(BufferedReader::readText)
     Log.d("DEBUG","Login response is ($responseCode): $responseBody")
 
-    return responseBody
+    var res:MyHttpResponse = MyHttpResponse(responseCode,responseBody)
+    res.statusCode =responseCode
+    res.response =responseBody
+    return res
 }

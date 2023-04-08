@@ -26,7 +26,9 @@ class BeaconReferenceApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
+    }
 
+    fun initBeaconService(){
         val beaconManager = BeaconManager.getInstanceForApplication(this)
         BeaconManager.setDebug(true)
 
@@ -52,7 +54,7 @@ class BeaconReferenceApplication: Application() {
         // The example shows how to find iBeacon.
         beaconManager.getBeaconParsers().add(
             BeaconParser().
-                setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"))
+            setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"))
 
         // enabling debugging will send lots of verbose debug information from the library to Logcat
         // this is useful for troubleshooting problmes
@@ -127,7 +129,7 @@ class BeaconReferenceApplication: Application() {
     }
 
     val centralRangingObserver = Observer<Collection<Beacon>> { beacons ->
-        Log.d(MainActivity.TAG, "Ranged: ${beacons.count()} beacons")
+        Log.d("MainActivity", "Ranged: ${beacons.count()} beacons")
         for (beacon: Beacon in beacons) {
             Log.d(TAG, "$beacon about ${beacon.distance} meters away")
             var currentTime = LocalDateTime.now();
