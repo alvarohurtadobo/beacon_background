@@ -1,4 +1,5 @@
 package com.bcontrol.app.bcontrol
+
 import android.util.Log
 import java.io.BufferedReader
 import java.io.DataOutputStream
@@ -8,7 +9,7 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 
 fun postJson(url: String, json: String): MyHttpResponse {
-    Log.d("DEBUG","Login with params $json")
+    Log.d("DEBUG", "Login with params $json")
     val urlObject = URL(url)
     val connection = urlObject.openConnection() as HttpURLConnection
     connection.requestMethod = "POST"
@@ -25,12 +26,13 @@ fun postJson(url: String, json: String): MyHttpResponse {
     outputStream.close()
 
     val responseCode = connection.responseCode
-    val inputStream = BufferedReader(InputStreamReader(connection.inputStream, StandardCharsets.UTF_8))
+    val inputStream =
+        BufferedReader(InputStreamReader(connection.inputStream, StandardCharsets.UTF_8))
     val responseBody = inputStream.use(BufferedReader::readText)
-    Log.d("DEBUG","Login response is ($responseCode): $responseBody")
+    Log.d("DEBUG", "Login response is ($responseCode): $responseBody")
 
-    var res:MyHttpResponse = MyHttpResponse(responseCode,responseBody)
-    res.statusCode =responseCode
-    res.response =responseBody
+    var res: MyHttpResponse = MyHttpResponse(responseCode, responseBody)
+    res.statusCode = responseCode
+    res.response = responseBody
     return res
 }

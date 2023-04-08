@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val policy = ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
-        Log.d("DEBUG","Main activity created")
+        Log.d("DEBUG", "Main activity created")
         setContentView(R.layout.activity_main)
     }
 

@@ -25,12 +25,12 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
     lateinit var monitoringButton: Button
     lateinit var rangingButton: Button
     lateinit var beaconReferenceApplication: BeaconReferenceApplication
-    lateinit var myContext:Context
+    lateinit var myContext: Context
     var alertDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        myContext= requireContext()
+        myContext = requireContext()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -41,17 +41,18 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         beaconReferenceApplication.initBeaconService()
 
         // Set up a Live Data observer for beacon data
-        val regionViewModel = BeaconManager.getInstanceForApplication(myContext).getRegionViewModel(beaconReferenceApplication.region)
+        val regionViewModel = BeaconManager.getInstanceForApplication(myContext)
+            .getRegionViewModel(beaconReferenceApplication.region)
         // observer will be called each time the monitored regionState changes (inside vs. outside region)
         regionViewModel.regionState.observe(viewLifecycleOwner, monitoringObserver)
         // observer will be called each time a new list of beacons is ranged (typically ~1 second in the foreground)
         regionViewModel.rangedBeacons.observe(viewLifecycleOwner, rangingObserver)
         rangingButton = requireView().findViewById<Button>(R.id.rangingButton)
-        rangingButton.setOnClickListener{
+        rangingButton.setOnClickListener {
             rangingButtonTapped(view)
         }
         monitoringButton = requireView().findViewById<Button>(R.id.monitoringButton)
-        monitoringButton.setOnClickListener{
+        monitoringButton.setOnClickListener {
             monitoringButtonTapped(view)
         }
         beaconListView = requireView().findViewById<ListView>(R.id.beaconList)
@@ -66,6 +67,7 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         Log.d(TAG, "onPause")
         super.onPause()
     }
+
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
@@ -101,8 +103,7 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
             beaconCountTextView.text = "Fuera de la zona de detección, no beacons detectados"
             beaconListView.adapter =
                 ArrayAdapter(myContext, android.R.layout.simple_list_item_1, arrayOf("--"))
-        }
-        else {
+        } else {
             beaconCountTextView.text = "Dentro de la zona de detección"
         }
         Log.d(TAG, "monitoring state changed to : $stateString")
@@ -135,8 +136,7 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
             beaconManager.startRangingBeacons(beaconReferenceApplication.region)
             rangingButton.text = "Detener escaneo"
             beaconCountTextView.text = "Detección habilitada, esperando primera detección"
-        }
-        else {
+        } else {
             beaconManager.stopRangingBeacons(beaconReferenceApplication.region)
             rangingButton.text = "Reanudar escaneo"
             beaconCountTextView.text = "Detección deshabilitada, no beacons detectados"
@@ -155,8 +155,7 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
             dialogMessage = "Verás una ventana cuando un beacon es o deja de ser detectado"
             monitoringButton.text = "Desactivar ventanas"
 
-        }
-        else {
+        } else {
             beaconManager.stopMonitoring(beaconReferenceApplication.region)
             dialogTitle = "Beacon monitoring stopped."
             dialogMessage = "Las ventanas de dialogo están deshabilitadas"

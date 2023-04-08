@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-
 class HomeSupervisorFragment : Fragment(R.layout.fragment_home_supervisor) {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

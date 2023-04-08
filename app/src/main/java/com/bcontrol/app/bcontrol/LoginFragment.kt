@@ -42,11 +42,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                         "https://7645-200-87-90-199.sa.ngrok.io/api/v1/token/",
                         """{"username": "$myUsername", "password": "$myPassword"}"""
                     )
-                    Log.d("DEBUG","Answer is ${answer.statusCode}:, ${answer.response}")
-                    if(answer.statusCode==200){
+                    Log.d("DEBUG", "Answer is ${answer.statusCode}:, ${answer.response}")
+                    if (answer.statusCode == 200) {
                         findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
-                    }else{
-                        var myContext= requireContext()
+                    } else {
+                        var myContext = requireContext()
                         val builder =
                             AlertDialog.Builder(myContext)
                         builder.setTitle("Error")
@@ -56,7 +56,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                         alertDialog = builder.create()
                         alertDialog?.show()
                     }
-
                 }
             }
         }

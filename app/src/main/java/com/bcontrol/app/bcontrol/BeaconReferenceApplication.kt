@@ -21,14 +21,14 @@ import java.time.format.DateTimeFormatter
 
 var lastDetection = LocalDateTime.now();
 
-class BeaconReferenceApplication: Application() {
+class BeaconReferenceApplication : Application() {
     lateinit var region: Region
 
     override fun onCreate() {
         super.onCreate()
     }
 
-    fun initBeaconService(){
+    fun initBeaconService() {
         val beaconManager = BeaconManager.getInstanceForApplication(this)
         BeaconManager.setDebug(true)
 
@@ -53,8 +53,8 @@ class BeaconReferenceApplication: Application() {
 
         // The example shows how to find iBeacon.
         beaconManager.getBeaconParsers().add(
-            BeaconParser().
-            setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"))
+            BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")
+        )
 
         // enabling debugging will send lots of verbose debug information from the library to Logcat
         // this is useful for troubleshooting problmes
@@ -92,11 +92,12 @@ class BeaconReferenceApplication: Application() {
         beaconManager.startMonitoring(region)
         beaconManager.startRangingBeacons(region)
         // These two lines set up a Live Data observer so this Activity can get beacon data from the Application class
-        val regionViewModel = BeaconManager.getInstanceForApplication(this).getRegionViewModel(region)
+        val regionViewModel =
+            BeaconManager.getInstanceForApplication(this).getRegionViewModel(region)
         // observer will be called each time the monitored regionState changes (inside vs. outside region)
-        regionViewModel.regionState.observeForever( centralMonitoringObserver)
+        regionViewModel.regionState.observeForever(centralMonitoringObserver)
         // observer will be called each time a new list of beacons is ranged (typically ~1 second in the foreground)
-        regionViewModel.rangedBeacons.observeForever( centralRangingObserver)
+        regionViewModel.rangedBeacons.observeForever(centralRangingObserver)
     }
 
     fun setupForegroundService() {
@@ -105,25 +106,28 @@ class BeaconReferenceApplication: Application() {
         builder.setContentTitle("Buscando Beacons.")
         val intent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
-                this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
         )
         builder.setContentIntent(pendingIntent);
-        val channel =  NotificationChannel("beacon-ref-notification-id",
-            "Detección de beacon", NotificationManager.IMPORTANCE_DEFAULT)
+        val channel = NotificationChannel(
+            "beacon-ref-notification-id",
+            "Detección de beacon", NotificationManager.IMPORTANCE_DEFAULT
+        )
         channel.setDescription("Esta notificación se lanza cuando un beacon es detectado.")
-        val notificationManager =  getSystemService(
-                Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(
+            Context.NOTIFICATION_SERVICE
+        ) as NotificationManager
         notificationManager.createNotificationChannel(channel);
         builder.setChannelId(channel.getId());
-        BeaconManager.getInstanceForApplication(this).enableForegroundServiceScanning(builder.build(), 456);
+        BeaconManager.getInstanceForApplication(this)
+            .enableForegroundServiceScanning(builder.build(), 456);
     }
 
     val centralMonitoringObserver = Observer<Int> { state ->
         if (state == MonitorNotifier.OUTSIDE) {
-            Log.d(TAG, "outside beacon region: "+region)
-        }
-        else {
-            Log.d(TAG, "inside beacon region: "+region)
+            Log.d(TAG, "outside beacon region: " + region)
+        } else {
+            Log.d(TAG, "inside beacon region: " + region)
 //            sendNotification()
         }
     }
@@ -133,7 +137,7 @@ class BeaconReferenceApplication: Application() {
         for (beacon: Beacon in beacons) {
             Log.d(TAG, "$beacon about ${beacon.distance} meters away")
             var currentTime = LocalDateTime.now();
-            if((currentTime.toEpochSecond(ZoneOffset.UTC)- lastDetection.toEpochSecond(ZoneOffset.UTC))>6) {
+            if ((currentTime.toEpochSecond(ZoneOffset.UTC) - lastDetection.toEpochSecond(ZoneOffset.UTC)) > 6) {
                 sendNotification((beacon.distance * 100).toInt())
                 lastDetection = currentTime
             }
