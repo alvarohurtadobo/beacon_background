@@ -42,7 +42,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                         "https://7645-200-87-90-199.sa.ngrok.io/api/v1/token/",
                         """{"username": "$myUsername", "password": "$myPassword"}"""
                     )
-                    Log.d("Answer is ${answer.statusCode}:, ${answer.response}")
+                    Log.d("DEBUG","Answer is ${answer.statusCode}:, ${answer.response}")
                     if(answer.statusCode==200){
                         findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
                     }else{
