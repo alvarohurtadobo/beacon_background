@@ -38,7 +38,6 @@
             android:layout_marginBottom="20dp"
             android:layout_weight="1"
             android:background="#FEC106"
-            android:onClick="rangingButtonTapped"
             android:text="Detener monitoreo"
             android:textColor="#FFFFFF"></Button>
 
@@ -50,7 +49,6 @@
             android:layout_marginRight="20dp"
             android:layout_weight="1"
             android:background="#FEC106"
-            android:onClick="monitoringButtonTapped"
             android:text="Desactivar ventanas"
             android:textColor="#FFFFFF"></Button>
     </LinearLayout>

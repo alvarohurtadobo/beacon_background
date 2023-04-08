@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".`LoginFragment.kt`">
+    tools:context="LoginFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <LinearLayout
@@ -38,8 +38,8 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/usernameContainer"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                app:helperText=""
-                app:helperTextTextColor="@android:color/holo_red_dark"
+                app:helperText="app:helperTextTextColor=@android:color/holo_red_dark"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -66,11 +66,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                app:helperText=""
-
+                app:helperText="app:helperTextTextColor=@android:color/holo_red_dark"
                 app:passwordToggleEnabled="true"
                 app:counterEnabled="true"
-                app:helperTextTextColor="@android:color/holo_red_dark"
                 android:inputType="textPassword"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

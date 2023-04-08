@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Button
+import androidx.navigation.fragment.findNavController
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
     lateinit var usernameTextInput:com.google.android.material.textfield.TextInputEditText
@@ -24,6 +25,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             if(myUsername == ""){
                 usernameContainer.helperText = "Campo requerido"
                 postJson("https://7645-200-87-90-199.sa.ngrok.io/api/v1/token/","""{"username": "alvaro001", "password": "12345678"}""")
+                findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
             }else{
                 usernameContainer.helperText = null
             }
