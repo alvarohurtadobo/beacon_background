@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/navigation">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/loginFragment">
 
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.bcontrol.app.bcontrol.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_homeSupervisorFragment"
+            app:destination="@id/homeSupervisorFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_monitoringFragment"
+            app:destination="@id/monitoringFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/homeSupervisorFragment"
+        android:name="com.bcontrol.app.bcontrol.HomeSupervisorFragment"
+        android:label="fragment_home_supervisor"
+        tools:layout="@layout/fragment_home_supervisor" />
+    <fragment
+        android:id="@+id/monitoringFragment"
+        android:name="com.bcontrol.app.bcontrol.MonitoringFragment"
+        android:label="MonitoringFragment" />
 </navigation>

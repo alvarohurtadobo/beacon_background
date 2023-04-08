@@ -1,14 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MonitoringFragment">
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/icon"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/beaconCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0 visible beacons:"
+        android:textAlignment="center" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/rangingButton"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1"
+            android:background="#FEC106"
+            android:onClick="rangingButtonTapped"
+            android:text="Detener monitoreo"
+            android:textColor="#FFFFFF"></Button>
+
+        <Button
+            android:id="@+id/monitoringButton"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight="1"
+            android:background="#FEC106"
+            android:onClick="monitoringButtonTapped"
+            android:text="Desactivar ventanas"
+            android:textColor="#FFFFFF"></Button>
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/beaconList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"></ListView>
+
+</LinearLayout>
