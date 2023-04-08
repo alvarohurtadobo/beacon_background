@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.bcontrol.app.bcontrol.LoginFragment"
+        android:name="com.bcontrol.app.bcontrol.`LoginFragment.kt`"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/homeSupervisorFragment"
-        android:name="com.bcontrol.app.bcontrol.HomeSupervisorFragment"
+        android:name="com.bcontrol.app.bcontrol.`HomeSupervisorFragment.kt`"
         android:label="fragment_home_supervisor"
         tools:layout="@layout/fragment_home_supervisor" />
     <fragment

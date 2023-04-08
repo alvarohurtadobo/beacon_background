@@ -1,10 +1,9 @@
-package com.arhm.diceroller
+package com.bcontrol.app.bcontrol
 
 import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.util.Log
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bcontrol.app.bcontrol.R
 
