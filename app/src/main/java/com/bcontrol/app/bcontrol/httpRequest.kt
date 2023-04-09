@@ -32,7 +32,5 @@ fun postJson(url: String, json: String): MyHttpResponse {
     Log.d("DEBUG", "Login response is ($responseCode): $responseBody")
 
     var res: MyHttpResponse = MyHttpResponse(responseCode, responseBody)
-    res.statusCode = responseCode
-    res.response = responseBody
     return res
 }

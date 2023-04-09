@@ -1,6 +1,8 @@
 package com.bcontrol.app.bcontrol
 
 import android.app.AlertDialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -16,8 +18,34 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     lateinit var btnLogin: Button
     var alertDialog: AlertDialog? = null
 
+    var myUsername: String = ""
+    var myPassword: String = ""
+    lateinit var sharedPreferences: SharedPreferences
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        sharedPreferences =
+            context?.getSharedPreferences("SESION", Context.MODE_PRIVATE)!!
+
+        myUsername = sharedPreferences?.getString("username", "")!!
+        myPassword = sharedPreferences?.getString("password", "")!!
+        if (myUsername != "" && myPassword != "") {
+            Log.d("DEBUG", "Registered data is $myUsername, $myPassword")
+            var answer: MyHttpResponse = postJson(
+                "https://7645-200-87-90-199.sa.ngrok.io/api/v1/token/",
+                """{"username": "$myUsername", "password": "$myPassword"}"""
+            )
+            Log.d("DEBUG", "Answer is ${answer.statusCode}:, ${answer.response}")
+            if (answer.statusCode == 200) {
+                findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
+            } else {
+                val editor = sharedPreferences?.edit()
+                editor?.putString("username", "")
+                editor?.putString("password", "")
+                editor?.commit()
+            }
+        }
         btnLogin = requireView().findViewById<Button>(R.id.loginButton)
         usernameTextInput =
             requireView().findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.usernameEditText)
@@ -28,8 +56,8 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         passwordContainer =
             requireView().findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.passwordContainer)
         btnLogin.setOnClickListener {
-            var myUsername: String = usernameTextInput.text.toString()
-            var myPassword: String = passwordTextInput.text.toString()
+            myUsername = usernameTextInput.text.toString()
+            myPassword = passwordTextInput.text.toString()
             Log.d("DEBUG", "Username is $myUsername, $myPassword")
             if (myUsername == "") {
                 usernameContainer.helperText = "Campo requerido"
@@ -45,6 +73,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     Log.d("DEBUG", "Answer is ${answer.statusCode}:, ${answer.response}")
                     if (answer.statusCode == 200) {
                         findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
+                        val editor = sharedPreferences?.edit()
+                        editor?.putString("username", myUsername)
+                        editor?.putString("password", myPassword)
+                        editor?.commit()
+
                     } else {
                         var myContext = requireContext()
                         val builder =
