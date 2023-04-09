@@ -33,12 +33,15 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         if (myUsername != "" && myPassword != "") {
             Log.d("DEBUG", "Registered data is $myUsername, $myPassword")
             var answer: MyHttpResponse = postJson(
-                "https://7645-200-87-90-199.sa.ngrok.io/api/v1/token/",
+                "https://44d7-2800-cd0-ad02-e00-e1ce-efba-b7ac-234e.ngrok-free.app/api/v1/token/",
                 """{"username": "$myUsername", "password": "$myPassword"}"""
             )
             Log.d("DEBUG", "Answer is ${answer.statusCode}:, ${answer.response}")
             if (answer.statusCode == 200) {
-                findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
+                myUser = UserModel.fromJsonString(answer.response)
+                Log.d("DEBUG","Direct user print $myUser")
+                Log.d("DEBUG","To String user print ${myUser.toString()}")
+                findNavController().navigate(R.id.action_loginFragment_to_homeSupervisorFragment)
             } else {
                 val editor = sharedPreferences?.edit()
                 editor?.putString("username", "")
@@ -67,12 +70,16 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 } else {
                     usernameContainer.helperText = null
                     var answer: MyHttpResponse = postJson(
-                        "https://7645-200-87-90-199.sa.ngrok.io/api/v1/token/",
+                        "https://44d7-2800-cd0-ad02-e00-e1ce-efba-b7ac-234e.ngrok-free.app/api/v1/token/",
                         """{"username": "$myUsername", "password": "$myPassword"}"""
                     )
                     Log.d("DEBUG", "Answer is ${answer.statusCode}:, ${answer.response}")
                     if (answer.statusCode == 200) {
-                        findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
+                        myUser = UserModel.fromJsonString(answer.response)
+                        Log.d("DEBUG","Direct user print $myUser")
+                        Log.d("DEBUG","To String user print ${myUser.toString()}")
+                        findNavController().navigate(R.id.action_loginFragment_to_homeSupervisorFragment)
+                        findNavController().navigate(R.id.action_loginFragment_to_homeSupervisorFragment)
                         val editor = sharedPreferences?.edit()
                         editor?.putString("username", myUsername)
                         editor?.putString("password", myPassword)
