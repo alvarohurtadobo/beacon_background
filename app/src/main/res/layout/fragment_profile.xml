@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"/>
 
     <EditText
-        android:id="@+id/first_name_edit_text"
+        android:id="@+id/firstname_edit_text"
         android:text="John"
         android:enabled="false"
         android:layout_marginTop="8dp"
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"/>
 
     <EditText
-        android:id="@+id/last_name_edit_text"
+        android:id="@+id/lastname_edit_text"
         android:text="Doe"
         android:enabled="false"
         android:layout_marginTop="8dp"

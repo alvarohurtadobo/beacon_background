@@ -21,11 +21,7 @@
         android:id="@+id/homeSupervisorFragment"
         android:name="com.bcontrol.app.bcontrol.HomeSupervisorFragment"
         android:label="fragment_home_supervisor"
-        tools:layout="@layout/fragment_home_supervisor" >
-        <action
-            android:id="@+id/action_homeSupervisorFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_home_supervisor" />
     <fragment
         android:id="@+id/monitoringFragment"
         android:name="com.bcontrol.app.bcontrol.MonitoringFragment"
@@ -40,9 +36,6 @@
         android:name="com.bcontrol.app.bcontrol.HomeWorkerFragment"
         android:label="fragment_home_worker"
         tools:layout="@layout/fragment_home_worker" >
-        <action
-            android:id="@+id/action_homeWorkerFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
         <action
             android:id="@+id/action_homeWorkerFragment_to_monitoringFragment"
             app:destination="@id/monitoringFragment" />
