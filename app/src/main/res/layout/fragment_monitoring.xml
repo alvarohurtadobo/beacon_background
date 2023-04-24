@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="start"
+    android:layout_gravity="start"
     tools:context=".MainActivity">
 
     <TextView
@@ -56,6 +56,18 @@
             android:layout_weight="1"
             android:background="#FEC106"
             android:text="Ver mi perfil"
+            android:textColor="#FFFFFF"></Button>
+
+        <Button
+            android:id="@+id/logoutButton"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1"
+            android:background="#FEC106"
+            android:text="Salir"
             android:textColor="#FFFFFF"></Button>
     </LinearLayout>
 

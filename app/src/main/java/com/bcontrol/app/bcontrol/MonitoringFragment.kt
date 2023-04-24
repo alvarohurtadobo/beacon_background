@@ -3,15 +3,13 @@ package com.bcontrol.app.bcontrol
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -25,9 +23,12 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
     lateinit var beaconCountTextView: TextView
     lateinit var monitoringButton: Button
     lateinit var goToLoginButton: Button
+    lateinit var logoutButton: Button
+
     lateinit var rangingButton: Button
     lateinit var beaconReferenceApplication: BeaconReferenceApplication
     lateinit var myContext: Context
+    lateinit var sharedPreferences: SharedPreferences
     var alertDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +61,16 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         goToLoginButton = requireView().findViewById<Button>(R.id.goToProfileButton)
         goToLoginButton.setOnClickListener {
             findNavController().navigate(R.id.action_monitoringFragment_to_profileFragment)
+
+        }
+        logoutButton = requireView().findViewById<Button>(R.id.logoutButton)
+        logoutButton.setOnClickListener {
+            Log.d("DEBUG", "pressed logout")
+//            Toast.makeText(this, "Hasta pronto", Toast.LENGTH_SHORT).show()
+            sharedPreferences =
+                context?.getSharedPreferences("SESION", Context.MODE_PRIVATE)!!
+            sharedPreferences.edit().clear().commit()
+            findNavController().navigate(R.id.action_monitoringFragment_to_loginFragment)
         }
         beaconListView = requireView().findViewById<ListView>(R.id.beaconList)
         beaconCountTextView = requireView().findViewById<TextView>(R.id.beaconCount)
