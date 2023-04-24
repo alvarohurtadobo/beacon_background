@@ -50,6 +50,19 @@
             android:layout_weight="1"
             android:background="#FEC106"
             android:text="Desactivar ventanas"
+            android:visibility="invisible"
+            android:textColor="#FFFFFF"></Button>
+
+        <Button
+            android:id="@+id/goToProfileButton"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1"
+            android:background="#FEC106"
+            android:text="Ver mi perfil"
             android:textColor="#FFFFFF"></Button>
     </LinearLayout>
 

@@ -43,7 +43,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 myUser = UserModel.fromJsonString(answer.response)
                 Log.d("DEBUG","Direct user print $myUser")
                 Log.d("DEBUG","To String user print ${myUser.toString()}")
-                findNavController().navigate(R.id.action_loginFragment_to_homeSupervisorFragment)
+                findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
             } else {
                 val editor = sharedPreferences?.edit()
                 editor?.putString("username", "")
@@ -80,8 +80,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                         myUser = UserModel.fromJsonString(answer.response)
                         Log.d("DEBUG","Direct user print $myUser")
                         Log.d("DEBUG","To String user print ${myUser.toString()}")
-                        findNavController().navigate(R.id.action_loginFragment_to_homeSupervisorFragment)
-                        findNavController().navigate(R.id.action_loginFragment_to_homeSupervisorFragment)
+                        findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
                         val editor = sharedPreferences?.edit()
                         editor?.putString("username", myUsername)
                         editor?.putString("password", myPassword)

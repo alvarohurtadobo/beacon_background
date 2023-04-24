@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import org.altbeacon.beacon.*
 import org.altbeacon.beacon.permissions.BeaconScanPermissionsActivity
 import java.time.LocalDateTime
@@ -23,6 +24,7 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
     lateinit var beaconListView: ListView
     lateinit var beaconCountTextView: TextView
     lateinit var monitoringButton: Button
+    lateinit var goToLoginButton: Button
     lateinit var rangingButton: Button
     lateinit var beaconReferenceApplication: BeaconReferenceApplication
     lateinit var myContext: Context
@@ -54,6 +56,10 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         monitoringButton = requireView().findViewById<Button>(R.id.monitoringButton)
         monitoringButton.setOnClickListener {
             monitoringButtonTapped(view)
+        }
+        goToLoginButton = requireView().findViewById<Button>(R.id.goToProfileButton)
+        goToLoginButton.setOnClickListener {
+            findNavController().navigate(R.id.action_monitoringFragment_to_profileFragment)
         }
         beaconListView = requireView().findViewById<ListView>(R.id.beaconList)
         beaconCountTextView = requireView().findViewById<TextView>(R.id.beaconCount)
