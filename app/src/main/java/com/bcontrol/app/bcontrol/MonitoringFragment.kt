@@ -130,7 +130,7 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
             beaconListView.adapter = ArrayAdapter(myContext, android.R.layout.simple_list_item_1,
                 beacons
                     .sortedBy { it.distance }
-                    .map { "${it.id1}\nid2: ${it.id2} id3:  rssi: ${it.rssi}\nest. distance: ${it.distance} m" }
+                    .map { "${it.id1}\nid2: ${it.id2} id3: ${it.id3} rssi: ${it.rssi}\nest. distance: ${it.distance} m.\n Código: (${it.beaconTypeCode}), Identifiers: ${it.identifiers}, Campos de datos: ${it.dataFields}, Campos de datos extra: ${it.extraDataFields}, Fabricante: ${it.manufacturer}" }
                     .toTypedArray()
             )
         }
