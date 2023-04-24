@@ -10,6 +10,8 @@ import android.view.View
 import android.widget.Button
 import androidx.navigation.fragment.findNavController
 
+val myUrl: String = "https://cbfe-2800-cd0-ad02-e00-5d89-4652-8a63-11ac.ngrok-free.app"
+
 class LoginFragment : Fragment(R.layout.fragment_login) {
     lateinit var usernameTextInput: com.google.android.material.textfield.TextInputEditText
     lateinit var usernameContainer: com.google.android.material.textfield.TextInputLayout
@@ -33,7 +35,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         if (myUsername != "" && myPassword != "") {
             Log.d("DEBUG", "Registered data is $myUsername, $myPassword")
             var answer: MyHttpResponse = postJson(
-                "https://44d7-2800-cd0-ad02-e00-e1ce-efba-b7ac-234e.ngrok-free.app/api/v1/token/",
+                "$myUrl/api/v1/token/",
                 """{"username": "$myUsername", "password": "$myPassword"}"""
             )
             Log.d("DEBUG", "Answer is ${answer.statusCode}:, ${answer.response}")
@@ -70,7 +72,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 } else {
                     usernameContainer.helperText = null
                     var answer: MyHttpResponse = postJson(
-                        "https://44d7-2800-cd0-ad02-e00-e1ce-efba-b7ac-234e.ngrok-free.app/api/v1/token/",
+                        "$myUrl/api/v1/token/",
                         """{"username": "$myUsername", "password": "$myPassword"}"""
                     )
                     Log.d("DEBUG", "Answer is ${answer.statusCode}:, ${answer.response}")

@@ -29,7 +29,25 @@ fun postJson(url: String, json: String): MyHttpResponse {
     val inputStream =
         BufferedReader(InputStreamReader(connection.inputStream, StandardCharsets.UTF_8))
     val responseBody = inputStream.use(BufferedReader::readText)
-    Log.d("DEBUG", "Login response is ($responseCode): $responseBody")
+    Log.d("POST", "Post Response is ($responseCode): $responseBody")
+
+    var res: MyHttpResponse = MyHttpResponse(responseCode, responseBody)
+    return res
+}
+
+fun getJson(url: String): MyHttpResponse {
+    Log.d("DEBUG", "Get $url")
+    val urlObject = URL(url)
+    val connection = urlObject.openConnection() as HttpURLConnection
+    connection.requestMethod = "GET"
+    connection.setRequestProperty("Content-Type", "application/json; utf-8")
+    connection.setRequestProperty("Accept", "application/json")
+
+    val responseCode = connection.responseCode
+
+    val inputStream = BufferedReader(InputStreamReader(connection.inputStream, StandardCharsets.UTF_8))
+    val responseBody = inputStream.use(BufferedReader::readText)
+    Log.d("GET","Get Response is: $responseBody")
 
     var res: MyHttpResponse = MyHttpResponse(responseCode, responseBody)
     return res
