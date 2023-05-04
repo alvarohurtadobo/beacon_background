@@ -10,7 +10,7 @@ import android.view.View
 import android.widget.Button
 import androidx.navigation.fragment.findNavController
 
-val myUrl: String = "https://cbfe-2800-cd0-ad02-e00-5d89-4652-8a63-11ac.ngrok-free.app"
+val myUrl: String = "https://b64f-2800-cd0-ad02-e00-159a-8d78-3efb-5ae7.ngrok-free.app"
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
     lateinit var usernameTextInput: com.google.android.material.textfield.TextInputEditText
