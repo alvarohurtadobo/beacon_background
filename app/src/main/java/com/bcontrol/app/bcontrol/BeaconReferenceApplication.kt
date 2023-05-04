@@ -19,7 +19,8 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-var lastDetection = LocalDateTime.now();
+var lastDetection = LocalDateTime.now()
+var lastDetectionForNotifications = LocalDateTime.now()
 
 class BeaconReferenceApplication : Application() {
     lateinit var region: Region
@@ -103,7 +104,7 @@ class BeaconReferenceApplication : Application() {
     fun setupForegroundService() {
         val builder = Notification.Builder(this, "BeaconReferenceApp")
         builder.setSmallIcon(R.drawable.ic_launcher_background)
-        builder.setContentTitle("Buscando Beacons.")
+        builder.setContentTitle("Escaneando alrededores")
         val intent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
@@ -120,7 +121,7 @@ class BeaconReferenceApplication : Application() {
         notificationManager.createNotificationChannel(channel);
         builder.setChannelId(channel.getId());
         BeaconManager.getInstanceForApplication(this)
-            .enableForegroundServiceScanning(builder.build(), 456);
+            .enableForegroundServiceScanning(builder.build(), 456)
     }
 
     val centralMonitoringObserver = Observer<Int> { state ->
@@ -133,24 +134,76 @@ class BeaconReferenceApplication : Application() {
     }
 
     val centralRangingObserver = Observer<Collection<Beacon>> { beacons ->
-        Log.d("MainActivity", "Ranged: ${beacons.count()} beacons")
-        for (beacon: Beacon in beacons) {
-            Log.d(TAG, "$beacon about ${beacon.distance} meters away")
-            var currentTime = LocalDateTime.now();
-            if ((currentTime.toEpochSecond(ZoneOffset.UTC) - lastDetection.toEpochSecond(ZoneOffset.UTC)) > 6) {
-                sendNotification((beacon.distance * 100).toInt())
-                lastDetection = currentTime
+        Log.d("MainActivity", "Ranged: ${beacons.count()} beacons in reference")
+        var currentTime = LocalDateTime.now()
+        if((currentTime.toEpochSecond(ZoneOffset.UTC) - lastDetection.toEpochSecond(ZoneOffset.UTC)) > 120){
+            Log.d("DEBUG", "More than two minutes, closing")
+            if(currentEvent.id !=0 ){
+                Log.d("DEBUG", "Closing current event ${currentEvent.id}")
+                val updteEventResponse = putJson("$myUrl/api/v1/business/event/${currentEvent.id}",
+                    """{"end_hour": ${currentTime.hour}, "end_minute": ${currentTime.minute}, "is_closed": true}""")
+                if(updteEventResponse.statusCode==200) {
+                    Log.d("DEBUG","Update event success")
+                    currentEvent = EventModel(0,0,0,0,0,0,0,false)
+                    currentDetectedBeacon = BeaconModel(0,"","","",0,"")
+
+                }else{
+                    Log.d("DEBUG","Update event failure ${updteEventResponse.statusCode}:${updteEventResponse.response}")
+                }
             }
         }
+        var newDetectedBeacon = findBeacon(beacons)
+        if(newDetectedBeacon.id!=0) {
+            Log.d("DEBUG", "Detected ${newDetectedBeacon.id}")
+            // A non zero, registered beacon, then we can update message in notification every minute
+            if ((currentTime.toEpochSecond(ZoneOffset.UTC) - lastDetectionForNotifications.toEpochSecond(ZoneOffset.UTC)) > 10) {
+                Log.d("DEBUG","Updating notification and last time for ${newDetectedBeacon.id}")
+                sendNotification(newDetectedBeacon)
+                lastDetectionForNotifications = currentTime
+            }
+            Log.d("DEBUG", "Comparing ${currentDetectedBeacon.id}")
+            // And if its a different beacon we switch area
+            if(currentDetectedBeacon.id!=newDetectedBeacon.id){
+                Log.d("DEBUG","Is different ${currentDetectedBeacon.id}, ${newDetectedBeacon.id}")
+                val currentTime = LocalDateTime.now()
+                // A new non 0 beacon detected, this is different than prev
+                if(currentDetectedBeacon.id!=0 && currentEvent.id !=0){
+                    // If prev has a non 0 id and we have an ongoing event we have to close current event
+//                            currentEvent.end_hour = currentTime.hour
+//                            currentEvent.end_minute = currentTime.minute
+                    Log.d("DEBUG","Closing prev ev")
+                    val updteEventResponse = putJson("$myUrl/api/v1/business/event/${currentEvent.id}",
+                        """{"end_hour": ${currentTime.hour}, "end_minute": ${currentTime.minute}, "is_closed": true}""")
+                    if(updteEventResponse.statusCode==200) {
+                        Log.d("DEBUG","Update event success")
+                        currentEvent = EventModel(0,0,0,0,0,0,0,false)
+                    }else{
+                        Log.d("DEBUG","Update event failure ${updteEventResponse.statusCode}:${updteEventResponse.response}")
+                    }
+                }
+                currentDetectedBeacon = newDetectedBeacon
 
+                currentEvent = EventModel(0,currentDetectedBeacon.id, myUser.id,currentTime.hour, currentTime.minute,0,0,false)
+                Log.d("DEBUG","Creating event $currentEvent")
+                val createEventResponse = postJson("$myUrl/api/v1/business/event",
+                    """{"beacon": ${currentEvent.beacon}, "user": ${currentEvent.user}, "start_hour": ${currentEvent.start_hour}, "start_minute": ${currentEvent.start_minute}}""")
+                if(createEventResponse.statusCode==201) {
+                    Log.d("DEBUG","Create event success")
+                    currentEvent = EventModel.fromJsonString(createEventResponse.response)
+                    Log.d("DEBUG","Created event $currentEvent")
+                }else{
+                    Log.d("DEBUG","Create event failure ${createEventResponse.statusCode}:${createEventResponse.response}")
+                }
+            }
+        }
     }
 
-    private fun sendNotification(distance: Int) {
+    private fun sendNotification(beacon: BeaconModel) {
         val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
         val current = LocalDateTime.now().format(formatter)
         val builder = NotificationCompat.Builder(this, "beacon-ref-notification-id")
-            .setContentTitle("Beacon detectado")
-            .setContentText("Distancia de $distance [cm] (Horas: $current)")
+            .setContentTitle("Área detectada: ${beacon.area_name}")
+            .setContentText("Última detección a horas: $current\n${beacon.model} (UUID: ${beacon.uuid})")
             .setSmallIcon(R.drawable.ic_launcher_background)
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addNextIntent(Intent(this, MainActivity::class.java))

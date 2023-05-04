@@ -19,7 +19,8 @@ import org.altbeacon.beacon.permissions.BeaconScanPermissionsActivity
 import java.time.LocalDateTime
 
 class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
-    lateinit var beaconListView: ListView
+//    lateinit var beaconListView: ListView
+    lateinit var resultText: TextView
     lateinit var beaconCountTextView: TextView
     lateinit var monitoringButton: Button
     lateinit var goToLoginButton: Button
@@ -61,7 +62,6 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         goToLoginButton = requireView().findViewById<Button>(R.id.goToProfileButton)
         goToLoginButton.setOnClickListener {
             findNavController().navigate(R.id.action_monitoringFragment_to_profileFragment)
-
         }
         logoutButton = requireView().findViewById<Button>(R.id.logoutButton)
         logoutButton.setOnClickListener {
@@ -72,11 +72,12 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
             sharedPreferences.edit().clear().commit()
             findNavController().navigate(R.id.action_monitoringFragment_to_loginFragment)
         }
-        beaconListView = requireView().findViewById<ListView>(R.id.beaconList)
+//        beaconListView = requireView().findViewById<ListView>(R.id.beaconList)
+        resultText= requireView().findViewById<TextView>(R.id.resultText)
         beaconCountTextView = requireView().findViewById<TextView>(R.id.beaconCount)
         beaconCountTextView.text = "No beacons detectados"
-        beaconListView.adapter =
-            ArrayAdapter(myContext, android.R.layout.simple_list_item_1, arrayOf("--"))
+//        beaconListView.adapter =
+//            ArrayAdapter(myContext, android.R.layout.simple_list_item_1, arrayOf("--"))
         Log.d("DEBUG", "Arrived to this")
     }
 
@@ -115,11 +116,12 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         var stateString = "inside"
         if (state == MonitorNotifier.OUTSIDE) {
             dialogTitle = "No beacons detectados"
-            dialogMessage = "didExitRegionEvent has fired"
+            dialogMessage = "Ya no se detectó actividad, en dos minutos se cerrará la el evento en curso"
             stateString == "outside"
             beaconCountTextView.text = "Fuera de la zona de detección, no beacons detectados"
-            beaconListView.adapter =
-                ArrayAdapter(myContext, android.R.layout.simple_list_item_1, arrayOf("--"))
+            resultText.setText("Fuera del área ${currentDetectedBeacon.area_name}, se desconectará automáticamente si no se reingresa")
+//            beaconListView.adapter =
+//                ArrayAdapter(myContext, android.R.layout.simple_list_item_1, arrayOf("--"))
         } else {
             beaconCountTextView.text = "Dentro de la zona de detección"
         }
@@ -135,15 +137,59 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
     }
 
     val rangingObserver = Observer<Collection<Beacon>> { beacons ->
-        Log.d(TAG, "Ranged: ${beacons.count()} beacons")
+        Log.d(TAG, "Ranged: ${beacons.count()} beacons in Monitor ${BeaconManager.getInstanceForApplication(myContext).rangedRegions.size}")
         if (BeaconManager.getInstanceForApplication(myContext).rangedRegions.size > 0) {
             beaconCountTextView.text = "Beacons detectados: ${beacons.count()}"
-            beaconListView.adapter = ArrayAdapter(myContext, android.R.layout.simple_list_item_1,
-                beacons
-                    .sortedBy { it.distance }
-                    .map { "${it.id1}\nid2: ${it.id2} id3: ${it.id3} rssi: ${it.rssi}\nest. distance: ${it.distance} m.\n Código: (${it.beaconTypeCode}), Identifiers: ${it.identifiers}, Campos de datos: ${it.dataFields}, Campos de datos extra: ${it.extraDataFields}, Fabricante: ${it.manufacturer}" }
-                    .toTypedArray()
-            )
+            if(beacons.count()>0) {
+                var newDetectedBeacon = findBeacon(beacons)
+
+                if(newDetectedBeacon.id==0){
+                    resultText.setText("Beacon no registrado: ${newDetectedBeacon.uuid}")
+                }else{
+                    if(currentDetectedBeacon.id!=newDetectedBeacon.id){
+                        val currentTime = LocalDateTime.now()
+                        Log.d("DEBUG", "Detectado ${newDetectedBeacon.id}, anterior: ${currentDetectedBeacon.id}, Current event: ${currentEvent.id}")
+                        // A new non 0 beacon detected, this is different than prev
+                        if(currentDetectedBeacon.id!=0 && currentEvent.id !=0){
+                            // If prev has a non 0 id and we have an ongoing event we have to close current event
+//                            currentEvent.end_hour = currentTime.hour
+//                            currentEvent.end_minute = currentTime.minute
+                            val updteEventResponse = putJson("$myUrl/api/v1/business/event/${currentEvent.id}",
+                                """{"end_hour": ${currentTime.hour}, "end_minute": ${currentTime.minute}, "is_closed": true}""")
+                            if(updteEventResponse.statusCode==200) {
+                                Log.d("DEBUG","Update event success")
+                                currentEvent = EventModel(0,0,0,0,0,0,0,false)
+                            }else{
+                                Log.d("DEBUG","Update event failure ${updteEventResponse.statusCode}:${updteEventResponse.response}")
+                            }
+                        }
+                        currentDetectedBeacon = newDetectedBeacon
+
+                        currentEvent = EventModel(0,currentDetectedBeacon.id, myUser.id,currentTime.hour, currentTime.minute,0,0,false)
+                        Log.d("DEBUG","Creating event $currentEvent")
+                        val createEventResponse = postJson("$myUrl/api/v1/business/event",
+                            """{"beacon": ${currentEvent.beacon}, "user": ${currentEvent.user}, "start_hour": ${currentEvent.start_hour}, "start_minute": ${currentEvent.start_minute}}""")
+                        if(createEventResponse.statusCode==201) {
+                            Log.d("DEBUG","Create event success")
+                            currentEvent = EventModel.fromJsonString(createEventResponse.response)
+                            Log.d("DEBUG","Created event $currentEvent")
+                        }else{
+                            Log.d("DEBUG","Create event failure ${createEventResponse.statusCode}:${createEventResponse.response}")
+                        }
+                    }else{
+                        //If new beacon id is not different from prev we update the timer
+                        lastDetection = LocalDateTime.now()
+                        Log.d("DEBUG", "Last detection updated to $lastDetection")
+                    }
+                    resultText.setText("Beacon: ${newDetectedBeacon.id}\nNombre: ${newDetectedBeacon.name}\nModelo: ${newDetectedBeacon.model}\nUUID: ${newDetectedBeacon.uuid}")
+                }
+            }
+//            beaconListView.adapter = ArrayAdapter(myContext, android.R.layout.simple_list_item_1,
+//                beacons
+//                    .sortedBy { it.distance }
+//                    .map { "${it.id1}\nid2: ${it.id2} id3: ${it.id3} rssi: ${it.rssi}\nest. distance: ${it.distance} m.\n Código: (${it.beaconTypeCode}), Identifiers: ${it.identifiers}, Campos de datos: ${it.dataFields}, Campos de datos extra: ${it.extraDataFields}, Fabricante: ${it.manufacturer}" }
+//                    .toTypedArray()
+//            )
         }
     }
 
@@ -157,8 +203,8 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
             beaconManager.stopRangingBeacons(beaconReferenceApplication.region)
             rangingButton.text = "Reanudar escaneo"
             beaconCountTextView.text = "Detección deshabilitada, no beacons detectados"
-            beaconListView.adapter =
-                ArrayAdapter(myContext, android.R.layout.simple_list_item_1, arrayOf("--"))
+//            beaconListView.adapter =
+//                ArrayAdapter(myContext, android.R.layout.simple_list_item_1, arrayOf("--"))
         }
     }
 
