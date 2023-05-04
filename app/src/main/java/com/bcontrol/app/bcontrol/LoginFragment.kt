@@ -48,11 +48,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         if (myUsername != "" && myPassword != "") {
             Log.d("DEBUG", "Registered data is $myUsername, $myPassword")
             var answer: MyHttpResponse = postJson(
-<<<<<<< HEAD
-                "https://6be3-2800-cd0-ad02-e00-48ad-e0af-864d-1d0c.ngrok-free.app/api/v1/token/",
-=======
                 "$myUrl/api/v1/token/",
->>>>>>> feature/removedDrawer
                 """{"username": "$myUsername", "password": "$myPassword"}"""
             )
             Log.d("DEBUG", "Answer is ${answer.statusCode}:, ${answer.response}")
@@ -60,16 +56,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 myUser = UserModel.fromJsonString(answer.response)
                 Log.d("DEBUG","Direct user print $myUser")
                 Log.d("DEBUG","To String user print ${myUser.toString()}")
-<<<<<<< HEAD
-
-                if(myUser.roleId==1) {
-                    findNavController().navigate(R.id.action_loginFragment_to_homeSupervisorFragment)
-                }else{
-                    findNavController().navigate(R.id.action_loginFragment_to_homeWorkerFragment)
-                }
-=======
                 findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
->>>>>>> feature/removedDrawer
             } else {
                 val editor = sharedPreferences?.edit()
                 editor?.putString("username", "")
