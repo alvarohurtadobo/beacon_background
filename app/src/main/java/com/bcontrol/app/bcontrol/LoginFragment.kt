@@ -9,6 +9,11 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Button
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.reflect.TypeToken
+
+val myUrl: String = "https://b64f-2800-cd0-ad02-e00-159a-8d78-3efb-5ae7.ngrok-free.app"
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
     lateinit var usernameTextInput: com.google.android.material.textfield.TextInputEditText
@@ -25,15 +30,29 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         sharedPreferences =
             context?.getSharedPreferences("SESION", Context.MODE_PRIVATE)!!
 
         myUsername = sharedPreferences?.getString("username", "")!!
         myPassword = sharedPreferences?.getString("password", "")!!
+        var beaconAnswer: MyHttpResponse = getJson(
+            "$myUrl/api/v1/business/beacon/byClient/4"
+        )
+        val gson = Gson()
+        val jsonArray = gson.fromJson(beaconAnswer.response, JsonArray::class.java)
+        listOfBeacons = jsonArray.map { gson.fromJson(it, BeaconModel::class.java) }.toMutableList()
+        Log.d("DEBUG", "listOfBeacons: ${listOfBeacons}")
+
         if (myUsername != "" && myPassword != "") {
             Log.d("DEBUG", "Registered data is $myUsername, $myPassword")
             var answer: MyHttpResponse = postJson(
+<<<<<<< HEAD
                 "https://6be3-2800-cd0-ad02-e00-48ad-e0af-864d-1d0c.ngrok-free.app/api/v1/token/",
+=======
+                "$myUrl/api/v1/token/",
+>>>>>>> feature/removedDrawer
                 """{"username": "$myUsername", "password": "$myPassword"}"""
             )
             Log.d("DEBUG", "Answer is ${answer.statusCode}:, ${answer.response}")
@@ -41,12 +60,16 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 myUser = UserModel.fromJsonString(answer.response)
                 Log.d("DEBUG","Direct user print $myUser")
                 Log.d("DEBUG","To String user print ${myUser.toString()}")
+<<<<<<< HEAD
 
                 if(myUser.roleId==1) {
                     findNavController().navigate(R.id.action_loginFragment_to_homeSupervisorFragment)
                 }else{
                     findNavController().navigate(R.id.action_loginFragment_to_homeWorkerFragment)
                 }
+=======
+                findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
+>>>>>>> feature/removedDrawer
             } else {
                 val editor = sharedPreferences?.edit()
                 editor?.putString("username", "")
@@ -75,7 +98,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 } else {
                     usernameContainer.helperText = null
                     var answer: MyHttpResponse = postJson(
-                        "https://44d7-2800-cd0-ad02-e00-e1ce-efba-b7ac-234e.ngrok-free.app/api/v1/token/",
+                        "$myUrl/api/v1/token/",
                         """{"username": "$myUsername", "password": "$myPassword"}"""
                     )
                     Log.d("DEBUG", "Answer is ${answer.statusCode}:, ${answer.response}")
@@ -83,8 +106,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                         myUser = UserModel.fromJsonString(answer.response)
                         Log.d("DEBUG","Direct user print $myUser")
                         Log.d("DEBUG","To String user print ${myUser.toString()}")
-                        findNavController().navigate(R.id.action_loginFragment_to_homeSupervisorFragment)
-                        findNavController().navigate(R.id.action_loginFragment_to_homeSupervisorFragment)
+                        findNavController().navigate(R.id.action_loginFragment_to_monitoringFragment)
                         val editor = sharedPreferences?.edit()
                         editor?.putString("username", myUsername)
                         editor?.putString("password", myPassword)

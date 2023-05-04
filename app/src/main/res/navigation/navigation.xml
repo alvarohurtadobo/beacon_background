@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_loginFragment_to_homeWorkerFragment"
             app:destination="@id/homeWorkerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_monitoringFragment"
+            app:destination="@id/monitoringFragment" />
     </fragment>
     <fragment
         android:id="@+id/homeSupervisorFragment"
@@ -25,7 +28,14 @@
     <fragment
         android:id="@+id/monitoringFragment"
         android:name="com.bcontrol.app.bcontrol.MonitoringFragment"
-        android:label="MonitoringFragment" />
+        android:label="MonitoringFragment" >
+        <action
+            android:id="@+id/action_monitoringFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_monitoringFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.bcontrol.app.bcontrol.ProfileFragment"
