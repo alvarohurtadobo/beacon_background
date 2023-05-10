@@ -61,7 +61,7 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         }
         goToLoginButton = requireView().findViewById<Button>(R.id.goToProfileButton)
         goToLoginButton.setOnClickListener {
-            findNavController().navigate(R.id.action_monitoringFragment_to_profileFragment)
+//            findNavController().navigate(R.id.action_monitoringFragment_to_profileFragment)
         }
         logoutButton = requireView().findViewById<Button>(R.id.logoutButton)
         logoutButton.setOnClickListener {
@@ -133,7 +133,7 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         builder.setPositiveButton(android.R.string.ok, null)
         alertDialog?.dismiss()
         alertDialog = builder.create()
-        alertDialog?.show()
+//        alertDialog?.show()
     }
 
     val rangingObserver = Observer<Collection<Beacon>> { beacons ->
@@ -231,7 +231,7 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         builder.setPositiveButton(android.R.string.ok, null)
         alertDialog?.dismiss()
         alertDialog = builder.create()
-        alertDialog?.show()
+//        alertDialog?.show()
 
     }
 
