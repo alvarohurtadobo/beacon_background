@@ -20,8 +20,8 @@ import org.altbeacon.beacon.permissions.BeaconScanPermissionsActivity
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     // Initialise the DrawerLayout, NavigationView and ToggleBar
-    private lateinit var drawerLayout: DrawerLayout
-    private lateinit var actionBarToggle: ActionBarDrawerToggle
+//    private lateinit var drawerLayout: DrawerLayout
+//    private lateinit var actionBarToggle: ActionBarDrawerToggle
     private lateinit var navView: NavigationView
     lateinit var navController: NavController
 
@@ -29,50 +29,51 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         val policy = ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+//        supportActionBar?.hide()
 //        setSupportActionBar(toolbar)
 //        supportActionBar?.title="Inicio"
         Log.d("DEBUG", "Main activity created")
         setContentView(R.layout.activity_main)
         // Call findViewById on the DrawerLayout
-        drawerLayout = findViewById(R.id.drawerLayout)
-        navView = findViewById<NavigationView>(R.id.navView)
+//        drawerLayout = findViewById(R.id.drawerLayout)
+//        navView = findViewById<NavigationView>(R.id.navView)
         // Pass the ActionBarToggle action into the drawerListener
-        actionBarToggle = ActionBarDrawerToggle(this, drawerLayout, 0, 0)
-        drawerLayout.addDrawerListener(actionBarToggle)
+//        actionBarToggle = ActionBarDrawerToggle(this, drawerLayout, 0, 0)
+//        drawerLayout.addDrawerListener(actionBarToggle)
         // Display the hamburger icon to launch the drawer
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Call syncState() on the action bar so it'll automatically change to the back button when the drawer layout is open
-        actionBarToggle.syncState()
+//        actionBarToggle.syncState()
         // Call findViewById on the NavigationView
         navController = this.findNavController(R.id.nav_host_fragment)
-        NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout)
-        NavigationUI.setupWithNavController(navView, navController)
+//        NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout)
+//        NavigationUI.setupWithNavController(navView, navController)
 //        replaceFragment(LoginFragment(), "Ingresar")
 
 
 
 //        navView.setupWithNavController(navController)
         // Call setNavigationItemSelectedListener on the NavigationView to detect when items are clicked
-        navView.setNavigationItemSelectedListener(this)
-
+//        navView.setNavigationItemSelectedListener(this)
     }
 
     // override the onSupportNavigateUp() function to launch the Drawer when the hamburger icon is clicked
     override fun onSupportNavigateUp(): Boolean {
-        drawerLayout.openDrawer(navView)
+//        drawerLayout.openDrawer(navView)
 //        val navController = this.findNavController(R.id.nav_host_fragment)
         return true;//NavigationUI.navigateUp(navController,drawerLayout)
     }
 
     // override the onBackPressed() function to close the Drawer when the back button is clicked
-    override fun onBackPressed() {
-        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            this.drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
-    }
+//    override fun onBackPressed() {
+//        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+//            this.drawerLayout.closeDrawer(GravityCompat.START)
+//        } else {
+//            super.onBackPressed()
+//        }
+//    }
 
     override fun onPause() {
         Log.d("MainActivity", "onPause")
@@ -113,7 +114,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
-        drawerLayout.closeDrawers()
+//        drawerLayout.closeDrawers()
         menuItem.isChecked = true
         when (menuItem.itemId) {
             R.id.home -> {

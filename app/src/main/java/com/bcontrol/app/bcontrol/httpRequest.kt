@@ -3,6 +3,7 @@ package com.bcontrol.app.bcontrol
 import android.util.Log
 import java.io.BufferedReader
 import java.io.DataOutputStream
+import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
@@ -26,12 +27,21 @@ fun postJson(url: String, json: String): MyHttpResponse {
     outputStream.close()
 
     val responseCode = connection.responseCode
-    val inputStream =
-        BufferedReader(InputStreamReader(connection.inputStream, StandardCharsets.UTF_8))
-    val responseBody = inputStream.use(BufferedReader::readText)
-    Log.d("POST", "Post Response is ($responseCode): $responseBody")
+    var res = MyHttpResponse(666, "")
+    try{
+        val inputStream =
+            BufferedReader(InputStreamReader(connection.inputStream, StandardCharsets.UTF_8))
+        val responseBody = inputStream.use(BufferedReader::readText)
+        Log.d("POST", "Post Response is ($responseCode): $responseBody")
 
-    var res: MyHttpResponse = MyHttpResponse(responseCode, responseBody)
+        res = MyHttpResponse(responseCode, responseBody)
+    } catch (e: IOException) {
+        Log.e("ERROR", "Error reading response: ${e.message}")
+        // Realiza las acciones necesarias en caso de error, por ejemplo:
+        // res = MyHttpResponse(-1, "Error reading response")
+    } finally {
+        connection.disconnect()
+    }
     return res
 }
 
@@ -53,12 +63,17 @@ fun putJson(url: String, json: String): MyHttpResponse {
     outputStream.close()
 
     val responseCode = connection.responseCode
-    val inputStream =
-        BufferedReader(InputStreamReader(connection.inputStream, StandardCharsets.UTF_8))
-    val responseBody = inputStream.use(BufferedReader::readText)
-    Log.d("POST", "Post Response is ($responseCode): $responseBody")
+    var res = MyHttpResponse(666, "")
+    try{
+        val inputStream =
+            BufferedReader(InputStreamReader(connection.inputStream, StandardCharsets.UTF_8))
+        val responseBody = inputStream.use(BufferedReader::readText)
+        Log.d("POST", "Post Response is ($responseCode): $responseBody")
 
-    var res: MyHttpResponse = MyHttpResponse(responseCode, responseBody)
+        res = MyHttpResponse(responseCode, responseBody)
+    } catch (err:java.lang.Error) {
+        Log.d("DEBUG", "Error was $err")
+    }
     return res
 }
 
@@ -71,11 +86,15 @@ fun getJson(url: String): MyHttpResponse {
     connection.setRequestProperty("Accept", "application/json")
 
     val responseCode = connection.responseCode
+    var res = MyHttpResponse(666, "")
+    try{
+        val inputStream = BufferedReader(InputStreamReader(connection.inputStream, StandardCharsets.UTF_8))
+        val responseBody = inputStream.use(BufferedReader::readText)
+        Log.d("GET","Get Response is: $responseBody")
 
-    val inputStream = BufferedReader(InputStreamReader(connection.inputStream, StandardCharsets.UTF_8))
-    val responseBody = inputStream.use(BufferedReader::readText)
-    Log.d("GET","Get Response is: $responseBody")
-
-    var res: MyHttpResponse = MyHttpResponse(responseCode, responseBody)
+        res = MyHttpResponse(responseCode, responseBody)
+    } catch (err:java.lang.Error) {
+        Log.d("DEBUG", "Error was $err")
+    }
     return res
 }

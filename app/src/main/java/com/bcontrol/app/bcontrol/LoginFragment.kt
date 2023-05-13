@@ -13,7 +13,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 
-val myUrl: String = "https://b64f-2800-cd0-ad02-e00-159a-8d78-3efb-5ae7.ngrok-free.app"
+val myUrl: String = "http://165.22.2.81"
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
     lateinit var usernameTextInput: com.google.android.material.textfield.TextInputEditText

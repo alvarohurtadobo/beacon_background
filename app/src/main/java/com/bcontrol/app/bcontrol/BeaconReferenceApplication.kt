@@ -101,6 +101,18 @@ class BeaconReferenceApplication : Application() {
         regionViewModel.rangedBeacons.observeForever(centralRangingObserver)
     }
 
+    fun stopBeaconService(){
+        var beaconManager: BeaconManager? = BeaconManager.getInstanceForApplication(this)
+        if (beaconManager != null) {
+            beaconManager.stopMonitoring(region)
+            beaconManager.stopRangingBeacons(region)
+        };
+//        beaconManager.stopMonitoringBeaconsInRegion(region)
+//        beaconManager.unbind(this);
+        beaconManager = null
+//        unregisterReceiver(beaconReceiver)
+    }
+
     fun setupForegroundService() {
         val builder = Notification.Builder(this, "BeaconReferenceApp")
         builder.setSmallIcon(R.drawable.ic_launcher_background)
@@ -119,7 +131,7 @@ class BeaconReferenceApplication : Application() {
             Context.NOTIFICATION_SERVICE
         ) as NotificationManager
         notificationManager.createNotificationChannel(channel);
-        builder.setChannelId(channel.getId());
+        builder.setChannelId(channel.getId())
         BeaconManager.getInstanceForApplication(this)
             .enableForegroundServiceScanning(builder.build(), 456)
     }
@@ -198,12 +210,18 @@ class BeaconReferenceApplication : Application() {
         }
     }
 
-    private fun sendNotification(beacon: BeaconModel) {
+    fun sendNotification(beacon: BeaconModel) {
+        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+        val current = LocalDateTime.now().format(formatter)
+        sendGenericNotification("Área detectada: ${beacon.area_name}", "Última detección a horas: $current\n${beacon.model} (UUID: ${beacon.uuid})")
+    }
+
+    fun sendGenericNotification(title: String, mesage: String) {
         val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
         val current = LocalDateTime.now().format(formatter)
         val builder = NotificationCompat.Builder(this, "beacon-ref-notification-id")
-            .setContentTitle("Área detectada: ${beacon.area_name}")
-            .setContentText("Última detección a horas: $current\n${beacon.model} (UUID: ${beacon.uuid})")
+            .setContentTitle(title)
+            .setContentText(mesage)
             .setSmallIcon(R.drawable.ic_launcher_background)
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addNextIntent(Intent(this, MainActivity::class.java))
