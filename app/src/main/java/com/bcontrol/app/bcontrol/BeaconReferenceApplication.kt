@@ -175,8 +175,8 @@ class BeaconReferenceApplication : Application() {
             }
             Log.d("DEBUG", "Comparing ${currentDetectedBeacon.id}")
             // And if its a different beacon we switch area
+            Log.d("DEBUG","Is different ${currentDetectedBeacon.id}, ${newDetectedBeacon.id}")
             if(currentDetectedBeacon.id!=newDetectedBeacon.id){
-                Log.d("DEBUG","Is different ${currentDetectedBeacon.id}, ${newDetectedBeacon.id}")
                 val currentTime = LocalDateTime.now()
                 // A new non 0 beacon detected, this is different than prev
                 if(currentDetectedBeacon.id!=0 && currentEvent.id !=0){
@@ -194,9 +194,10 @@ class BeaconReferenceApplication : Application() {
                     }
                 }
                 currentDetectedBeacon = newDetectedBeacon
+                currentDetectedBeacon.id = newDetectedBeacon.id
 
                 currentEvent = EventModel(0,currentDetectedBeacon.id, myUser.id,currentTime.hour, currentTime.minute,0,0,false)
-                Log.d("DEBUG","Creating event $currentEvent")
+                Log.d("DEBUG","Creating event in reference $currentEvent")
                 val createEventResponse = postJson("$myUrl/api/v1/business/event",
                     """{"beacon": ${currentEvent.beacon}, "user": ${currentEvent.user}, "start_hour": ${currentEvent.start_hour}, "start_minute": ${currentEvent.start_minute}}""")
                 if(createEventResponse.statusCode==201) {
@@ -223,6 +224,7 @@ class BeaconReferenceApplication : Application() {
             .setContentTitle(title)
             .setContentText(mesage)
             .setSmallIcon(R.drawable.ic_launcher_background)
+            .setSound(null)
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addNextIntent(Intent(this, MainActivity::class.java))
         val resultPendingIntent = stackBuilder.getPendingIntent(

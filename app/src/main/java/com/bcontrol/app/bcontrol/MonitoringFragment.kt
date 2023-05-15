@@ -165,9 +165,10 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
                             }
                         }
                         currentDetectedBeacon = newDetectedBeacon
+                        currentDetectedBeacon.id = newDetectedBeacon.id
 
                         currentEvent = EventModel(0,currentDetectedBeacon.id, myUser.id,currentTime.hour, currentTime.minute,0,0,false)
-                        Log.d("DEBUG","Creating event $currentEvent")
+                        Log.d("DEBUG","Creating event in fragment $currentEvent")
                         val createEventResponse = postJson("$myUrl/api/v1/business/event",
                             """{"beacon": ${currentEvent.beacon}, "user": ${currentEvent.user}, "start_hour": ${currentEvent.start_hour}, "start_minute": ${currentEvent.start_minute}}""")
                         if(createEventResponse.statusCode==201) {

@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import org.altbeacon.beacon.Beacon
 
 data class BeaconModel(
-    val id: Int,
+    var id: Int,
     val name: String,
     val uuid: String,
     val model: String,
