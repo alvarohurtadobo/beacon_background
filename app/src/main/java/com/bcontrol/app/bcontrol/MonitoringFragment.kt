@@ -24,9 +24,9 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
     lateinit var beaconCountTextView: TextView
 //    lateinit var monitoringButton: Button
 //    lateinit var goToLoginButton: Button
-    lateinit var logoutButton: Button
+//    lateinit var logoutButton: Button
 
-    lateinit var rangingButton: Button
+//    lateinit var rangingButton: Button
     lateinit var beaconReferenceApplication: BeaconReferenceApplication
     lateinit var myContext: Context
     lateinit var sharedPreferences: SharedPreferences
@@ -51,10 +51,10 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         regionViewModel.regionState.observe(viewLifecycleOwner, monitoringObserver)
         // observer will be called each time a new list of beacons is ranged (typically ~1 second in the foreground)
         regionViewModel.rangedBeacons.observe(viewLifecycleOwner, rangingObserver)
-        rangingButton = requireView().findViewById<Button>(R.id.rangingButton)
-        rangingButton.setOnClickListener {
-            rangingButtonTapped(view)
-        }
+//        rangingButton = requireView().findViewById<Button>(R.id.rangingButton)
+//        rangingButton.setOnClickListener {
+//            rangingButtonTapped(view)
+//        }
 //        monitoringButton = requireView().findViewById<Button>(R.id.monitoringButton)
 //        monitoringButton.setOnClickListener {
 //            monitoringButtonTapped(view)
@@ -63,16 +63,18 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
 //        goToLoginButton.setOnClickListener {
 //            findNavController().navigate(R.id.action_monitoringFragment_to_profileFragment)
 //        }
-        logoutButton = requireView().findViewById<Button>(R.id.logoutButton)
-        logoutButton.setOnClickListener {
-            Log.d("DEBUG", "pressed logout")
-            beaconReferenceApplication.stopBeaconService()
-            sharedPreferences =
-                context?.getSharedPreferences("SESION", Context.MODE_PRIVATE)!!
-            sharedPreferences.edit().clear().commit()
-            findNavController().navigate(R.id.action_monitoringFragment_to_loginFragment)
-            beaconReferenceApplication.sendGenericNotification("Monitoreo detenido", "Usted ha salido del sistema")
-        }
+
+        // LOGUT LOGIC
+//        logoutButton = requireView().findViewById<Button>(R.id.logoutButton)
+//        logoutButton.setOnClickListener {
+//            Log.d("DEBUG", "pressed logout")
+//            beaconReferenceApplication.stopBeaconService()
+//            sharedPreferences =
+//                context?.getSharedPreferences("SESION", Context.MODE_PRIVATE)!!
+//            sharedPreferences.edit().clear().commit()
+//            findNavController().navigate(R.id.action_monitoringFragment_to_loginFragment)
+//            beaconReferenceApplication.sendGenericNotification("Monitoreo detenido", "Usted ha salido del sistema")
+//        }
 //        beaconListView = requireView().findViewById<ListView>(R.id.beaconList)
         resultText= requireView().findViewById<TextView>(R.id.resultText)
         beaconCountTextView = requireView().findViewById<TextView>(R.id.beaconCount)
@@ -145,7 +147,12 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
                 var newDetectedBeacon = findBeacon(beacons)
 
                 if(newDetectedBeacon.id==0){
-                    resultText.setText("Beacon no registrado: ${newDetectedBeacon.uuid}")
+                    var legend = "No se encontró Beacons registrados."
+                    legend+= "\nBeacon más próximo: ${newDetectedBeacon.uuid}"
+                    var lef = beacons.map { "\n${it.id1.toString() },"}
+                    legend+= "\n\nOtros Beacons:"
+                    legend+= lef
+                    resultText.setText(legend)
                 }else{
                     if(currentDetectedBeacon.id!=newDetectedBeacon.id){
                         val currentTime = LocalDateTime.now()
@@ -165,7 +172,8 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
                             }
                         }
                         currentDetectedBeacon = newDetectedBeacon
-                        currentDetectedBeacon.id = newDetectedBeacon.id
+                        var share =context?.getSharedPreferences("SESION", Context.MODE_PRIVATE)
+                        share?.edit()?.putInt("last_beacon_id", currentDetectedBeacon.id)
 
                         currentEvent = EventModel(0,currentDetectedBeacon.id, myUser.id,currentTime.hour, currentTime.minute,0,0,false)
                         Log.d("DEBUG","Creating event in fragment $currentEvent")
@@ -183,7 +191,12 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
                         lastDetection = LocalDateTime.now()
                         Log.d("DEBUG", "Last detection updated to $lastDetection")
                     }
-                    resultText.setText("Beacon: ${newDetectedBeacon.id}\nNombre: ${newDetectedBeacon.name}\nModelo: ${newDetectedBeacon.model}\nUUID: ${newDetectedBeacon.uuid}")
+                    var lef = beacons.map { "\n${it.id1.toString() },"}
+                    var legend = "Beacon: ${newDetectedBeacon.id}\nNombre: ${newDetectedBeacon.name}\nModelo: ${newDetectedBeacon.model}\nUUID: ${newDetectedBeacon.uuid}"
+                    legend+= "\n\nOtros Beacons cercanos:"
+                    legend+= lef
+                    resultText.setText(legend)
+                    resultText.setText(legend)
                 }
             }
 //            beaconListView.adapter = ArrayAdapter(myContext, android.R.layout.simple_list_item_1,
@@ -195,23 +208,23 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
         }
     }
 
-    fun rangingButtonTapped(view: View) {
-        val beaconManager = BeaconManager.getInstanceForApplication(myContext)
-        if (beaconManager.rangedRegions.size == 0) {
-            beaconManager.startRangingBeacons(beaconReferenceApplication.region)
-            rangingButton.text = "Detener escaneo"
-            beaconCountTextView.text = "Detección habilitada, esperando primera detección"
-            beaconReferenceApplication.sendGenericNotification("Monitoreo reiniciado", "Usted ha encendido el monitoreo")
-        } else {
-            beaconManager.stopRangingBeacons(beaconReferenceApplication.region)
-            rangingButton.text = "Reanudar escaneo"
-            beaconCountTextView.text = "Detección deshabilitada, no beacons detectados"
-//            beaconListView.adapter =
-//                ArrayAdapter(myContext, android.R.layout.simple_list_item_1, arrayOf("--"))
-
-            beaconReferenceApplication.sendGenericNotification("Monitoreo detenido", "Usted ha detenido el monitoreo")
-        }
-    }
+//    fun rangingButtonTapped(view: View) {
+//        val beaconManager = BeaconManager.getInstanceForApplication(myContext)
+//        if (beaconManager.rangedRegions.size == 0) {
+//            beaconManager.startRangingBeacons(beaconReferenceApplication.region)
+//            rangingButton.text = "Detener escaneo"
+//            beaconCountTextView.text = "Detección habilitada, esperando primera detección"
+//            beaconReferenceApplication.sendGenericNotification("Monitoreo reiniciado", "Usted ha encendido el monitoreo")
+//        } else {
+//            beaconManager.stopRangingBeacons(beaconReferenceApplication.region)
+//            rangingButton.text = "Reanudar escaneo"
+//            beaconCountTextView.text = "Detección deshabilitada, no beacons detectados"
+////            beaconListView.adapter =
+////                ArrayAdapter(myContext, android.R.layout.simple_list_item_1, arrayOf("--"))
+//
+//            beaconReferenceApplication.sendGenericNotification("Monitoreo detenido", "Usted ha detenido el monitoreo")
+//        }
+//    }
 
     fun monitoringButtonTapped(view: View) {
         var dialogTitle = ""

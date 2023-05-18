@@ -1,5 +1,6 @@
 package com.bcontrol.app.bcontrol
 
+import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import org.altbeacon.beacon.Beacon
@@ -26,17 +27,19 @@ var listOfBeacons: MutableList<BeaconModel> = mutableListOf()
 
 var currentDetectedBeacon: BeaconModel = BeaconModel(0,"","","",0,"")
 
-fun findBeacon(beacons: Collection<Beacon>):BeaconModel{
+fun findBeacon(beacons: Collection<Beacon>) : BeaconModel{
     if(beacons.isEmpty()){
         return BeaconModel(0,"","","",0,"")
     }
     var myAuxBeacon: Beacon = beacons.sortedBy { it.distance }[0]
+    Log.d("DEBUG", "Complete fields: $myAuxBeacon")
+//    myAuxBeacon.id
 
     var myBeacon = BeaconModel(0,"",myAuxBeacon.id1.toString(),"",0,"")
     try {
         myBeacon =
             listOfBeacons.first { it.uuid == myAuxBeacon.id1.toString() }
-        Log.d("DEBUG", "Beacon found ${myBeacon.uuid}")
+        Log.d("DEBUG", "Beacon found ${myBeacon.id}: ${myBeacon.uuid}")
         return myBeacon;
     }catch (error: java.lang.Exception){
         Log.d("DEBUG", "Beacon not found ${myBeacon.uuid}")

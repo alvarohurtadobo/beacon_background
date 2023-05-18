@@ -3,6 +3,7 @@ package com.bcontrol.app.bcontrol
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -172,6 +173,7 @@ class BeaconReferenceApplication : Application() {
                 Log.d("DEBUG","Updating notification and last time for ${newDetectedBeacon.id}")
                 sendNotification(newDetectedBeacon)
                 lastDetectionForNotifications = currentTime
+                lastDetection = currentTime
             }
             Log.d("DEBUG", "Comparing ${currentDetectedBeacon.id}")
             // And if its a different beacon we switch area
@@ -194,7 +196,9 @@ class BeaconReferenceApplication : Application() {
                     }
                 }
                 currentDetectedBeacon = newDetectedBeacon
-                currentDetectedBeacon.id = newDetectedBeacon.id
+                var share = getSharedPreferences("SESION", Context.MODE_PRIVATE)
+                share.edit().putInt("last_beacon_id", currentDetectedBeacon.id)
+                Log.d("DEBUG","Is no longer different ${currentDetectedBeacon.id}, ${newDetectedBeacon.id}")
 
                 currentEvent = EventModel(0,currentDetectedBeacon.id, myUser.id,currentTime.hour, currentTime.minute,0,0,false)
                 Log.d("DEBUG","Creating event in reference $currentEvent")
@@ -214,7 +218,7 @@ class BeaconReferenceApplication : Application() {
     fun sendNotification(beacon: BeaconModel) {
         val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
         val current = LocalDateTime.now().format(formatter)
-        sendGenericNotification("Área detectada: ${beacon.area_name}", "Última detección a horas: $current\n${beacon.model} (UUID: ${beacon.uuid})")
+        sendGenericNotification("Área detectada: ${beacon.area_name}", "Última detección a horas: $current\n${beacon.model} (id: ${beacon.id}, UUID: ${beacon.uuid})")
     }
 
     fun sendGenericNotification(title: String, mesage: String) {
@@ -223,8 +227,8 @@ class BeaconReferenceApplication : Application() {
         val builder = NotificationCompat.Builder(this, "beacon-ref-notification-id")
             .setContentTitle(title)
             .setContentText(mesage)
-            .setSmallIcon(R.drawable.ic_launcher_background)
-            .setSound(null)
+            .setSmallIcon(R.drawable.ic_launcher_background).setSilent(true)
+//            .setSound(Uri.parse("android.resource://" + packageName + "/raw/blank"))
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addNextIntent(Intent(this, MainActivity::class.java))
         val resultPendingIntent = stackBuilder.getPendingIntent(
