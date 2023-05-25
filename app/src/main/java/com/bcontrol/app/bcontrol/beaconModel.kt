@@ -31,15 +31,15 @@ fun findBeacon(beacons: Collection<Beacon>) : BeaconModel{
     if(beacons.isEmpty()){
         return BeaconModel(0,"","","",0,"")
     }
-    var myAuxBeacon: Beacon = beacons.sortedBy { it.distance }[0]
-    Log.d("DEBUG", "Complete fields: $myAuxBeacon")
-//    myAuxBeacon.id
+    var myAuxBeacon: Beacon = beacons.sortedBy { it.distance }[0]//    myAuxBeacon.id
+    var realUUID: String = myAuxBeacon.id1.toString()+"-"+myAuxBeacon.id2.toString()+"-"+myAuxBeacon.id3.toString()+"-"+myAuxBeacon.bluetoothAddress
+    Log.d("DEBUG", "Complete fields: $myAuxBeacon, real: $realUUID, blue add: ${myAuxBeacon.bluetoothAddress}, serv uuid: ${myAuxBeacon.serviceUuid}, rssi: ${myAuxBeacon.rssi}, parser iden: ${myAuxBeacon.parserIdentifier}, serv uuid 128: ${myAuxBeacon.serviceUuid128Bit}")
 
-    var myBeacon = BeaconModel(0,"",myAuxBeacon.id1.toString(),"",0,"")
+    var myBeacon = BeaconModel(0,"",realUUID,"",0,"")
     try {
         myBeacon =
-            listOfBeacons.first { it.uuid == myAuxBeacon.id1.toString() }
-        Log.d("DEBUG", "Beacon found ${myBeacon.id}: ${myBeacon.uuid}")
+            listOfBeacons.first { it.uuid == realUUID }
+        Log.d("DEBUG", "Beacon found: ${myBeacon.id}, ${myBeacon.uuid}")
         return myBeacon;
     }catch (error: java.lang.Exception){
         Log.d("DEBUG", "Beacon not found ${myBeacon.uuid}")

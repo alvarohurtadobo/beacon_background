@@ -150,8 +150,8 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
                     var legend = "No se encontró Beacons registrados."
                     legend+= "\nBeacon más próximo: ${newDetectedBeacon.uuid}"
                     var lef = beacons.map { "\n${it.id1.toString() },"}
-                    legend+= "\n\nOtros Beacons:"
-                    legend+= lef
+//                    legend+= "\n\nOtros Beacons:"
+//                    legend+= lef
                     resultText.setText(legend)
                 }else{
                     if(currentDetectedBeacon.id!=newDetectedBeacon.id){
@@ -193,9 +193,8 @@ class MonitoringFragment : Fragment(R.layout.fragment_monitoring) {
                     }
                     var lef = beacons.map { "\n${it.id1.toString() },"}
                     var legend = "Beacon: ${newDetectedBeacon.id}\nNombre: ${newDetectedBeacon.name}\nModelo: ${newDetectedBeacon.model}\nUUID: ${newDetectedBeacon.uuid}"
-                    legend+= "\n\nOtros Beacons cercanos:"
-                    legend+= lef
-                    resultText.setText(legend)
+//                    legend+= "\n\nOtros Beacons cercanos:"
+//                    legend+= lef
                     resultText.setText(legend)
                 }
             }

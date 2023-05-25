@@ -122,16 +122,27 @@ class BeaconReferenceApplication : Application() {
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
         )
-        builder.setContentIntent(pendingIntent);
+        builder.setContentIntent(pendingIntent)
         val channel = NotificationChannel(
             "beacon-ref-notification-id",
             "Detección de beacon", NotificationManager.IMPORTANCE_DEFAULT
         )
         channel.setDescription("Esta notificación se lanza cuando un beacon es detectado.")
+
+        // for debug
+        val channelDeb = NotificationChannel(
+            "debug",
+            "Detección de errores", NotificationManager.IMPORTANCE_DEFAULT
+        )
+        channelDeb.setDescription("Esta notificación se lanza para debug.")
+        // end for deb
         val notificationManager = getSystemService(
             Context.NOTIFICATION_SERVICE
         ) as NotificationManager
-        notificationManager.createNotificationChannel(channel);
+        notificationManager.createNotificationChannel(channel)
+
+        notificationManager.createNotificationChannel(channelDeb)
+
         builder.setChannelId(channel.getId())
         BeaconManager.getInstanceForApplication(this)
             .enableForegroundServiceScanning(builder.build(), 456)
@@ -148,70 +159,117 @@ class BeaconReferenceApplication : Application() {
 
     val centralRangingObserver = Observer<Collection<Beacon>> { beacons ->
         Log.d("MainActivity", "Ranged: ${beacons.count()} beacons in reference")
+        sendDebugNotification("Escaneo permanece activo", "Existen ${beacons.count()} beacons alrededor")
         var currentTime = LocalDateTime.now()
-        if((currentTime.toEpochSecond(ZoneOffset.UTC) - lastDetection.toEpochSecond(ZoneOffset.UTC)) > 120){
-            Log.d("DEBUG", "More than two minutes, closing")
-            if(currentEvent.id !=0 ){
-                Log.d("DEBUG", "Closing current event ${currentEvent.id}")
-                val updteEventResponse = putJson("$myUrl/api/v1/business/event/${currentEvent.id}",
-                    """{"end_hour": ${currentTime.hour}, "end_minute": ${currentTime.minute}, "is_closed": true}""")
-                if(updteEventResponse.statusCode==200) {
-                    Log.d("DEBUG","Update event success")
-                    currentEvent = EventModel(0,0,0,0,0,0,0,false)
-                    currentDetectedBeacon = BeaconModel(0,"","","",0,"")
+        try {
+            if ((currentTime.toEpochSecond(ZoneOffset.UTC) - lastDetection.toEpochSecond(ZoneOffset.UTC)) > 120) {
+                Log.d("DEBUG", "More than two minutes, closing")
+                if (currentEvent.id != 0) {
+                    Log.d("DEBUG", "Closing current event ${currentEvent.id}")
+                    val updteEventResponse = putJson(
+                        "$myUrl/api/v1/business/event/${currentEvent.id}",
+                        """{"end_hour": ${currentTime.hour}, "end_minute": ${currentTime.minute}, "is_closed": true}"""
+                    )
+                    if (updteEventResponse.statusCode == 200) {
+                        Log.d("DEBUG", "Update event success")
+                        currentEvent = EventModel(0, 0, 0, 0, 0, 0, 0, false)
+                        currentDetectedBeacon = BeaconModel(0, "", "", "", 0, "")
 
-                }else{
-                    Log.d("DEBUG","Update event failure ${updteEventResponse.statusCode}:${updteEventResponse.response}")
-                }
-            }
-        }
-        var newDetectedBeacon = findBeacon(beacons)
-        if(newDetectedBeacon.id!=0) {
-            Log.d("DEBUG", "Detected ${newDetectedBeacon.id}")
-            // A non zero, registered beacon, then we can update message in notification every minute
-            if ((currentTime.toEpochSecond(ZoneOffset.UTC) - lastDetectionForNotifications.toEpochSecond(ZoneOffset.UTC)) > 10) {
-                Log.d("DEBUG","Updating notification and last time for ${newDetectedBeacon.id}")
-                sendNotification(newDetectedBeacon)
-                lastDetectionForNotifications = currentTime
-                lastDetection = currentTime
-            }
-            Log.d("DEBUG", "Comparing ${currentDetectedBeacon.id}")
-            // And if its a different beacon we switch area
-            Log.d("DEBUG","Is different ${currentDetectedBeacon.id}, ${newDetectedBeacon.id}")
-            if(currentDetectedBeacon.id!=newDetectedBeacon.id){
-                val currentTime = LocalDateTime.now()
-                // A new non 0 beacon detected, this is different than prev
-                if(currentDetectedBeacon.id!=0 && currentEvent.id !=0){
-                    // If prev has a non 0 id and we have an ongoing event we have to close current event
-//                            currentEvent.end_hour = currentTime.hour
-//                            currentEvent.end_minute = currentTime.minute
-                    Log.d("DEBUG","Closing prev ev")
-                    val updteEventResponse = putJson("$myUrl/api/v1/business/event/${currentEvent.id}",
-                        """{"end_hour": ${currentTime.hour}, "end_minute": ${currentTime.minute}, "is_closed": true}""")
-                    if(updteEventResponse.statusCode==200) {
-                        Log.d("DEBUG","Update event success")
-                        currentEvent = EventModel(0,0,0,0,0,0,0,false)
-                    }else{
-                        Log.d("DEBUG","Update event failure ${updteEventResponse.statusCode}:${updteEventResponse.response}")
+                    } else {
+                        Log.d(
+                            "DEBUG",
+                            "Update event failure ${updteEventResponse.statusCode}:${updteEventResponse.response}"
+                        )
                     }
                 }
-                currentDetectedBeacon = newDetectedBeacon
-                var share = getSharedPreferences("SESION", Context.MODE_PRIVATE)
-                share.edit().putInt("last_beacon_id", currentDetectedBeacon.id)
-                Log.d("DEBUG","Is no longer different ${currentDetectedBeacon.id}, ${newDetectedBeacon.id}")
+            }
+        } catch (err:java.lang.Error) {
+            sendDebugNotification("Error al cerrar evento", "Error: ${err.message}")
+        }
+        var newDetectedBeacon = BeaconModel(0,"","","",0,"")
+        try {
+            newDetectedBeacon = findBeacon(beacons)
+        } catch (err:java.lang.Error) {
+            sendDebugNotification("Error al encontrar beacon", "Error: ${err.message}")
+        }
+        try {
+            if (newDetectedBeacon.id != 0) {
+                Log.d("DEBUG", "Detected ${newDetectedBeacon.id}")
+                // A non zero, registered beacon, then we can update message in notification every minute
+                if ((currentTime.toEpochSecond(ZoneOffset.UTC) - lastDetectionForNotifications.toEpochSecond(
+                        ZoneOffset.UTC
+                    )) > 10
+                ) {
+                    Log.d(
+                        "DEBUG",
+                        "Updating notification and last time for ${newDetectedBeacon.id}"
+                    )
+                    sendNotification(newDetectedBeacon)
+                    lastDetectionForNotifications = currentTime
+                    lastDetection = currentTime
+                }
+                Log.d("DEBUG", "Comparing ${currentDetectedBeacon.id}")
+                // And if its a different beacon we switch area
+                Log.d("DEBUG", "Is different ${currentDetectedBeacon.id}, ${newDetectedBeacon.id}")
+                if (currentDetectedBeacon.id != newDetectedBeacon.id) {
+                    val currentTime = LocalDateTime.now()
+                    // A new non 0 beacon detected, this is different than prev
+                    if (currentDetectedBeacon.id != 0 && currentEvent.id != 0) {
+                        // If prev has a non 0 id and we have an ongoing event we have to close current event
+//                            currentEvent.end_hour = currentTime.hour
+//                            currentEvent.end_minute = currentTime.minute
+                        Log.d("DEBUG", "Closing prev ev")
+                        val updteEventResponse = putJson(
+                            "$myUrl/api/v1/business/event/${currentEvent.id}",
+                            """{"end_hour": ${currentTime.hour}, "end_minute": ${currentTime.minute}, "is_closed": true}"""
+                        )
+                        if (updteEventResponse.statusCode == 200) {
+                            Log.d("DEBUG", "Update event success")
+                            currentEvent = EventModel(0, 0, 0, 0, 0, 0, 0, false)
+                        } else {
+                            Log.d(
+                                "DEBUG",
+                                "Update event failure ${updteEventResponse.statusCode}:${updteEventResponse.response}"
+                            )
+                        }
+                    }
+                    currentDetectedBeacon = newDetectedBeacon
+                    var share = getSharedPreferences("SESION", Context.MODE_PRIVATE)
+                    share.edit().putInt("last_beacon_id", currentDetectedBeacon.id)
+                    Log.d(
+                        "DEBUG",
+                        "Is no longer different ${currentDetectedBeacon.id}, ${newDetectedBeacon.id}"
+                    )
 
-                currentEvent = EventModel(0,currentDetectedBeacon.id, myUser.id,currentTime.hour, currentTime.minute,0,0,false)
-                Log.d("DEBUG","Creating event in reference $currentEvent")
-                val createEventResponse = postJson("$myUrl/api/v1/business/event",
-                    """{"beacon": ${currentEvent.beacon}, "user": ${currentEvent.user}, "start_hour": ${currentEvent.start_hour}, "start_minute": ${currentEvent.start_minute}}""")
-                if(createEventResponse.statusCode==201) {
-                    Log.d("DEBUG","Create event success")
-                    currentEvent = EventModel.fromJsonString(createEventResponse.response)
-                    Log.d("DEBUG","Created event $currentEvent")
-                }else{
-                    Log.d("DEBUG","Create event failure ${createEventResponse.statusCode}:${createEventResponse.response}")
+                    currentEvent = EventModel(
+                        0,
+                        currentDetectedBeacon.id,
+                        myUser.id,
+                        currentTime.hour,
+                        currentTime.minute,
+                        0,
+                        0,
+                        false
+                    )
+                    Log.d("DEBUG", "Creating event in reference $currentEvent")
+                    val createEventResponse = postJson(
+                        "$myUrl/api/v1/business/event",
+                        """{"beacon": ${currentEvent.beacon}, "user": ${currentEvent.user}, "start_hour": ${currentEvent.start_hour}, "start_minute": ${currentEvent.start_minute}}"""
+                    )
+                    if (createEventResponse.statusCode == 201) {
+                        Log.d("DEBUG", "Create event success")
+                        currentEvent = EventModel.fromJsonString(createEventResponse.response)
+                        Log.d("DEBUG", "Created event $currentEvent")
+                    } else {
+                        Log.d(
+                            "DEBUG",
+                            "Create event failure ${createEventResponse.statusCode}:${createEventResponse.response}"
+                        )
+                    }
                 }
             }
+        }catch (err:java.lang.Error) {
+            sendDebugNotification("Error al crear evento", "Error: ${err.message}")
         }
     }
 
@@ -221,10 +279,30 @@ class BeaconReferenceApplication : Application() {
         sendGenericNotification("Área detectada: ${beacon.area_name}", "Última detección a horas: $current\n${beacon.model} (id: ${beacon.id}, UUID: ${beacon.uuid})")
     }
 
-    fun sendGenericNotification(title: String, mesage: String) {
+    fun sendGenericNotification(title: String, message: String) {
         val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
         val current = LocalDateTime.now().format(formatter)
         val builder = NotificationCompat.Builder(this, "beacon-ref-notification-id")
+            .setContentTitle(title)
+            .setContentText(message)
+            .setSmallIcon(R.drawable.ic_launcher_background).setSilent(true)
+//            .setSound(Uri.parse("android.resource://" + packageName + "/raw/blank"))
+        val stackBuilder = TaskStackBuilder.create(this)
+        stackBuilder.addNextIntent(Intent(this, MainActivity::class.java))
+        val resultPendingIntent = stackBuilder.getPendingIntent(
+            0,
+            PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE
+        )
+        builder.setContentIntent(resultPendingIntent)
+        val notificationManager =
+            this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(1, builder.build())
+    }
+
+    fun sendDebugNotification(title: String, mesage: String) {
+        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+        val current = LocalDateTime.now().format(formatter)
+        val builder = NotificationCompat.Builder(this, "debug")
             .setContentTitle(title)
             .setContentText(mesage)
             .setSmallIcon(R.drawable.ic_launcher_background).setSilent(true)
