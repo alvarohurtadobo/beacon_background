@@ -12,9 +12,9 @@
     <!-- Below is only needed if you want to read the device name or establish a bluetooth connection
     -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-feature android:name="android.hardware.bluetooth" android:required="true" />
+<!--    <uses-permission android:name="android.permission.BLUETOOTH" />-->
+<!--    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />-->
+<!--    <uses-feature android:name="android.hardware.bluetooth" android:required="true" />-->
 
     <application
         android:name="com.bcontrol.app.bcontrol.BeaconReferenceApplication"
